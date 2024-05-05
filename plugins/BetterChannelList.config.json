@@ -1,0 +1,19 @@
+{
+    "currentVersionInfo": {
+        "version": "1.0.5",
+        "hasShownChangelog": true
+    },
+    "sidebarWidth": 303,
+    "settings": {
+        "lastMessage": {
+            "enabled": false,
+            "roleColors": true
+        },
+        "redesign": {
+            "enabled": true
+        },
+        "resizer": {
+            "enabled": true
+        }
+    }
+}
