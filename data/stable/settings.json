@@ -1,12 +1,12 @@
 {
     "general": {
-        "voiceDisconnect": true,
-        "showToasts": false,
-        "mediaKeys": true,
+        "voiceDisconnect": false,
+        "showToasts": true,
+        "mediaKeys": false,
         "bdContextMenu": true
     },
     "addons": {
-        "addonErrors": false,
+        "addonErrors": true,
         "editAction": "detached"
     },
     "customcss": {
@@ -16,11 +16,11 @@
     },
     "editor": {
         "lineNumbers": true,
-        "minimap": false,
+        "minimap": true,
         "hover": true,
         "quickSuggestions": true,
         "fontSize": 14,
-        "renderWhitespace": "all"
+        "renderWhitespace": "selection"
     },
     "window": {
         "transparency": false,
