@@ -7,7 +7,7 @@
     "BetterChatNames": true,
     "BetterFolders": true,
     "BetterInvites": true,
-    "BetterMediaPlayer": true,
+    "BetterMediaPlayer": false,
     "BetterPictureInPicture": true,
     "BetterSearchPage": true,
     "BetterSyntax": true,
