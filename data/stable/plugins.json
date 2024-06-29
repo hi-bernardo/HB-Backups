@@ -7,7 +7,7 @@
     "BetterChatNames": true,
     "BetterFolders": true,
     "BetterInvites": true,
-    "BetterMediaPlayer": false,
+    "BetterMediaPlayer": true,
     "BetterPictureInPicture": true,
     "BetterSearchPage": true,
     "BetterSyntax": true,
@@ -21,5 +21,8 @@
     "ReadAllNotificationsButton": true,
     "ServerFolders": true,
     "ThemeRepo": true,
-    "YABDP4Nitro": true
+    "YABDP4Nitro": true,
+    "BetterChannelList": true,
+    "BetterImageViewer": true,
+    "Uncompressed Images": true
 }

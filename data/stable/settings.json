@@ -1,12 +1,12 @@
 {
     "general": {
-        "voiceDisconnect": false,
-        "showToasts": true,
-        "mediaKeys": false,
-        "bdContextMenu": true
+        "voiceDisconnect": true,
+        "showToasts": false,
+        "mediaKeys": true,
+        "bdContextMenu": false
     },
     "addons": {
-        "addonErrors": true,
+        "addonErrors": false,
         "editAction": "detached"
     },
     "customcss": {
@@ -32,7 +32,7 @@
         "devTools": false,
         "debuggerHotkey": false,
         "reactDevTools": false,
-        "inspectElement": false,
-        "devToolsWarning": false
+        "inspectElement": true,
+        "devToolsWarning": true
     }
 }

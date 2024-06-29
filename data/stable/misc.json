@@ -2,12 +2,12 @@
     "version": "1.10.2",
     "drawerStates": {
         "settings": {
-            "addons": false,
-            "customcss": false,
-            "editor": false,
+            "addons": true,
+            "customcss": true,
+            "editor": true,
             "window": false,
             "developer": false,
-            "general": false
+            "general": true
         }
     },
     "addonlistControls": {
