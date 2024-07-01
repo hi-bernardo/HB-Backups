@@ -1,7 +1,7 @@
 /**
  * @name YABDP4Nitro
  * @author Riolubruh
- * @version 5.4.2
+ * @version 5.4.4
  * @invite EFmGEWAUns
  * @source https://github.com/riolubruh/YABDP4Nitro
  * @updateUrl https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js
@@ -56,6 +56,7 @@ const Dispatcher = Webpack.getByKeys("subscribe", "dispatch");
 const canUserUseMod = Webpack.getByKeys("canUserUse");
 const AvatarDefaults = Webpack.getByKeys("getEmojiURL");
 const LadderModule = BdApi.Webpack.getModule(BdApi.Webpack.Filters.byProps("calculateLadder"), { searchExports: true });
+const FetchCollectibleCategories = BdApi.Webpack.getByKeys("B1", "DR", "F$", "K$").F$
 //#endregion
 
 module.exports = (() => {
@@ -67,19 +68,17 @@ module.exports = (() => {
 				"discord_id": "359063827091816448",
 				"github_username": "riolubruh"
 			}],
-			"version": "5.4.2",
+			"version": "5.4.4",
 			"description": "Unlock all screensharing modes, and use cross-server & GIF emotes!",
 			"github": "https://github.com/riolubruh/YABDP4Nitro",
 			"github_raw": "https://raw.githubusercontent.com/riolubruh/YABDP4Nitro/main/YABDP4Nitro.plugin.js"
 		},
 		changelog: [
 			{
-				title: "5.4.2",
+				title: "5.4.4",
 				items: [
-					"Fix gradient client themes not saving properly if you closed the client without changing any plugin settings afterwards.",
-					"Fix Force Stickers Unlocked option no longer working.",
-					"Reworked screenshare-related bypasses.",
-					"Updated descriptions for Custom Bitrate settings."
+					"Added missing CSS for UsrBG integration.",
+					"Fix \"There was a problem updating your profile\" error caused by unnecessary patch to getAllPending."
 				]
 			}
 		],
@@ -127,6 +126,7 @@ module.exports = (() => {
 				PluginUpdater,
 				Logger
 			} = Api;
+
 			return class YABDP4Nitro extends Plugin {
 				defaultSettings = {
 					"emojiSize": 64,
@@ -427,11 +427,30 @@ module.exports = (() => {
 
 					}
 
+					BdApi.DOM.removeStyle("UsrBGIntegration");
+
 					if (this.settings.fakeProfileBanners) {
 						this.bannerUrlDecoding();
 						this.bannerUrlEncoding(this.secondsightifyEncodeOnly);
-						this.bannerUrlDecodingPreview();
+						if(this.settings.userBgIntegration){
+							BdApi.DOM.addStyle("UsrBGIntegration", `
+								:is([class*="userProfile"], [class*="userPopout"]) [class*="bannerPremium"] {
+									background: center / cover no-repeat;
+								}
+
+								[class*="NonPremium"]:has([class*="bannerPremium"]) [class*="avatarPositionNormal"],
+								[class*="PremiumWithoutBanner"]:has([class*="bannerPremium"]) [class*="avatarPositionPremiumNoBanner"] {
+									top: 76px;
+								}
+
+								[style*="background-image"] [class*="background_"] {
+									background-color: transparent !important;
+								}`
+							)
+						}
 					}
+
+					Dispatcher.unsubscribe("COLLECTIBLES_CATEGORIES_FETCH_SUCCESS", this.storeProductsFromCategories);
 
 					if (this.settings.fakeAvatarDecorations) {
 						this.fakeAvatarDecorations();
@@ -480,24 +499,6 @@ module.exports = (() => {
 						}
 					}
 
-					/* if (this.settings.unlockAppIcons || this.settings.changePremiumType || this.settings.experiments) { //account panel breaking shit workaround
-						if (this.accountPanelRenderer == undefined) this.accountPanelRenderer = Webpack.getAllByKeys("default").filter(obj => obj.default.toString().includes("useIsHomeSelected"))[0];
-
-						BdApi.Patcher.after(this.getName(), this.accountPanelRenderer, "default", (_, args, ret) => {
-							if (this.settings.unlockAppIcons || this.settings.changePremiumType) ret.props.currentUser.premiumType = 1;
-							if (this.settings.experiments) ret.props.currentUser.flags |= 1;
-							if (this.settings.ResolutionSwapper && (document.getElementById("qualityButton") == undefined || document.getElementById("qualityInputFPS") == undefined)) {
-								this.buttonCreate();
-								document.getElementById("qualityInput").addEventListener("input", this.updateQuick);
-								document.getElementById("qualityInputFPS").addEventListener("input", this.updateQuick);
-								if (!this.settings.ResolutionSwapper) {
-									if (document.getElementById("qualityButton") != undefined) document.getElementById("qualityButton").style.display = 'none';
-									if (document.getElementById("qualityMenu") != undefined) document.getElementById("qualityMenu").style.display = 'none';
-								}
-							}
-						});
-					} */
-
 					BdApi.Patcher.instead(this.getName(), canUserUseMod, "canUserUse", (_, [feature, user], originalFunction) => {
 
 						if (this.settings.emojiBypass && (feature.name == "emojisEverywhere" || feature.name == "animatedEmojis")) {
@@ -525,16 +526,26 @@ module.exports = (() => {
 					if (this.hasAppliedExperiments) return;
 					//Code graciously stolen from https://gist.github.com/MeguminSama/2cae24c9e4c335c661fa94e72235d4c4?permalink_comment_id=4952988#gistcomment-4952988
 					try {
-						let cache; webpackChunkdiscord_app.push([["wp_isdev_patch"], {}, r => cache = r.c]);
-						let UserStore = Webpack.getStore("UserStore")
-						let actions = Object.values(UserStore._dispatcher._actionHandlers._dependencyGraph.nodes);
-						let user = UserStore.getCurrentUser();
-						actions.find(n => n.name === "ExperimentStore").actionHandler.CONNECTION_OPEN({
-							type: "CONNECTION_OPEN", user: { flags: user.flags |= 1 }, experiments: [],
-						});
-						actions.find(n => n.name === "DeveloperExperimentStore").actionHandler.CONNECTION_OPEN();
-						webpackChunkdiscord_app.pop(); user.flags &= ~1; "done";
-						this.hasAppliedExperiments = true;
+						let _, a = Object.values,
+							b = "getCurrentUser",
+							c = "actionHandler",
+							d = "_actionHandlers",
+							l = "_dispatcher",
+							i = "ExperimentStore";
+						webpackChunkdiscord_app.push([
+							[Date.now()], {},
+							e => {
+								_ = e
+							}
+						]), m = a((u = a(_.c).find(e => e?.exports?.default?.[b] && e?.exports?.default?.[l]?.[d]).exports.default)[l][d]._dependencyGraph.nodes), u[b]().flags |= 1, m.find(e => "Developer" + i == e.name)[c].CONNECTION_OPEN();
+						try {
+							m.find(e => i == e.name)[c].OVERLAY_INITIALIZE({
+								user: {
+									flags: 1
+								}
+							})
+						} catch { }
+						m.find(e => i == e.name).storeDidChange()
 					} catch (err) {
 						//console.warn(err);
 					}
@@ -1125,15 +1136,23 @@ module.exports = (() => {
 					});
 				}
 
-
 				//Everything related to fake avatar decorations.
-				async fakeAvatarDecorations() {
-					//remove old format
-					if (Array.isArray(this.settings.avatarDecorations)) {
-						this.settings.avatarDecorations = new Object();
-						Utilities.saveSettings(this.getName(), this.settings);
-					}
 
+				storeProductsFromCategories = event => {
+					if (event.categories) {
+						event.categories.forEach(category => {
+							category.products.forEach(product => {
+								product.items.forEach(item => {
+									if (item.asset) {
+										Object.assign(this.settings.avatarDecorations)[item.id] = item.asset;
+									}
+								})
+							})
+						})
+					}
+				}
+
+				async fakeAvatarDecorations() {
 					//keep track of profiles downloaded
 					BdApi.Patcher.after(this.getName(), userProfileMod, "getUserProfile", (_, [args], ret) => {
 						if (ret == undefined) return;
@@ -1218,34 +1237,27 @@ module.exports = (() => {
 						}
 					}); //end of getUser patch for avatar decorations
 
-					//wait for shop module to be loaded
-					await Webpack.waitForModule(Webpack.Filters.byStrings("useFetchPurchases"), { searchExports: true });
+					//subscribe to successful collectible category fetch event
+					Dispatcher.subscribe("COLLECTIBLES_CATEGORIES_FETCH_SUCCESS", this.storeProductsFromCategories);
 
 					//trigger decorations fetch
-					await Dispatcher.dispatch({
-						type: "COLLECTIBLES_CATEGORIES_FETCH"
-					});
-
-					let products = [];
-					Webpack.getStore("CollectiblesCategoryStore").products.forEach((item) => {
-						products.push(item)
-					});
-
-					products.forEach(product => {
-						product.items.forEach(item => {
-							if (item.asset != undefined) {
-								Object.assign(this.settings.avatarDecorations)[item.id] = item.asset;
-							}
-						})
-					});
+					FetchCollectibleCategories(
+						{
+							includeBundles: true,
+							includeUnpublished: false,
+							noCache: false,
+							paymentGateway: undefined
+						}
+					)
 
 					//Wait for avatar decor customization section render module to be loaded.
 					await Webpack.waitForModule(Webpack.Filters.byStrings("userAvatarDecoration"));
 
 					//Avatar decoration customization section render module/function.
-					const decorationCustomizationSectionMod = Webpack.getAllByKeys("Z").filter((obj) => obj.Z.toString().includes("userAvatarDecoration"))[0];
+					if(!this.decorationCustomizationSectionMod) this.decorationCustomizationSectionMod = Webpack.getAllByKeys("Z").filter((obj) => obj.Z.toString().includes("userAvatarDecoration"))[0];
+
 					//Avatar decoration customization section patch
-					BdApi.Patcher.after(this.getName(), decorationCustomizationSectionMod, "Z", (_, [args], ret) => {
+					BdApi.Patcher.after(this.getName(), this.decorationCustomizationSectionMod, "Z", (_, [args], ret) => {
 						//don't run if this is the try out nitro flow.
 						if (args.isTryItOutFlow) return;
 
@@ -2183,13 +2195,13 @@ module.exports = (() => {
 								onClick: () => {
 									let themeColors = null;
 									try {
-										themeColors = Webpack.getByKeys("getTryItOutThemeColors").getAllTryItOut().tryItOutThemeColors;
+										themeColors = Webpack.getStore("UserSettingsAccountStore").getAllTryItOut().tryItOutThemeColors;
 									} catch (err) {
 										console.warn(err);
 									}
 									if (themeColors == null) {
 										try {
-											themeColors = Webpack.getByKeys("getTryItOutThemeColors").getAllPending().pendingThemeColors;
+											themeColors = Webpack.getStore("UserSettingsAccountStore").getAllPending().pendingThemeColors;
 										} catch (err) {
 											console.error(err);
 										}
@@ -2469,30 +2481,6 @@ module.exports = (() => {
 				} //End of bannerUrlEncoding()
 
 
-				bannerUrlDecodingPreview() {
-					if (this.profileCustomizationModule == undefined) this.profileCustomizationModule = Webpack.getByKeys("getTryItOutThemeColors");
-					BdApi.Patcher.after(this.getName(), this.profileCustomizationModule, "getAllPending", (_, args, ret) => {
-						let user = CurrentUser;
-						let userProfile = userProfileMod.getUserProfile(user.id);
-						if (userProfile == undefined) return;
-
-						let parsed = this.secondsightifyRevealOnly(userProfile.bio);
-						if (parsed == undefined) return;
-
-						let regex = /B\{[^}]*\}/;
-						let matches = parsed.toString().match(regex);
-						if (matches == undefined) return;
-						if (matches == "") return;
-						let matchedText = matches[0].replace("B{", "").replace("}", "");
-						if (!String(matchedText).endsWith(".gif") && !String(matchedText).endsWith(".png") && !String(matchedText).endsWith(".jpg") && !String(matchedText).endsWith(".jpeg") && !String(matchedText).endsWith(".webp") && !String(matchedText).endsWith(".mp4") && !String(matchedText).endsWith(".tiff") && !String(matchedText).endsWith(".avi") && !String(matchedText).endsWith(".webm")) {
-							matchedText += ".gif"; //No supported file extension detected. 
-							//Falling back to default file extension
-						}
-						ret.pendingBanner = `https://i.imgur.com/${matchedText}`;
-					});
-				}
-
-
 				appIcons() {
 					this.settings.changePremiumType = true; //Forcibly enable premiumType. Couldn't find a workaround, sry.
 
@@ -2543,6 +2531,7 @@ module.exports = (() => {
 				onStop() {
 					CurrentUser.premiumType = ORIGINAL_NITRO_STATUS;
 					BdApi.Patcher.unpatchAll(this.getName());
+					Dispatcher.unsubscribe("COLLECTIBLES_CATEGORIES_FETCH_SUCCESS", this.storeProductsFromCategories);
 					if (document.getElementById("qualityButton")) document.getElementById("qualityButton").remove();
 					if (document.getElementById("qualityMenu")) document.getElementById("qualityMenu").remove();
 					if (document.getElementById("qualityInput")) document.getElementById("qualityInput").remove();
@@ -2555,6 +2544,7 @@ module.exports = (() => {
 					if (document.getElementById("profilePictureButton")) document.getElementById("profilePictureButton").remove();
 					BdApi.DOM.removeStyle(this.getName());
 					BdApi.DOM.removeStyle("YABDP4NitroBadges");
+					BdApi.DOM.removeStyle("UsrBGIntegration");
 					userBgs = [];
 				}
 			};

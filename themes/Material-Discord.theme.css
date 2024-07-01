@@ -19,7 +19,7 @@
 .theme-dark {
     --saturation-modifier: 0.2;
     --lightness-modifier: 0.25;
-    --text-lightness-modifier: 0.9;
+    --text-lightness-modifier: 0.85;
 }
 
 /* MATERIAL YOU LIGHT THEME SETTINGS */
