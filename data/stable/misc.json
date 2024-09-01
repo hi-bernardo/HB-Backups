@@ -7,7 +7,7 @@
             "editor": false,
             "window": false,
             "developer": false,
-            "general": false
+            "general": true
         }
     },
     "addonlistControls": {

@@ -1,6 +1,6 @@
 {
     "currentVersionInfo": {
-        "version": "8.4.0",
+        "version": "8.4.6",
         "hasShownChangelog": true
     },
     "cuiSettingsVersion": "13",
@@ -22,7 +22,7 @@
     "resizableChannelList": "true",
     "resizableMembersList": "true",
     "resizableUserProfile": "true",
-    "channelListWidth": "303",
+    "channelListWidth": "295",
     "membersListWidth": "0",
     "profilePanelWidth": "0",
     "buttonsOrder": "1,2,4,6,7,3,5,8",

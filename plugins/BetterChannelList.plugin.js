@@ -4,7 +4,7 @@
  * @authorLink https://github.com/arg0NNY/DiscordPlugins
  * @invite M8DBtcZjXD
  * @donate https://donationalerts.com/r/arg0nny
- * @version 1.1.1
+ * @version 1.1.4
  * @description 3 in 1: Shows the most recent message for each channel, brings channel list redesign from the new mobile UI and allows you to alter the sidebar width.
  * @website https://github.com/arg0NNY/DiscordPlugins/tree/master/BetterChannelList
  * @source https://github.com/arg0NNY/DiscordPlugins/blob/master/BetterChannelList/BetterChannelList.plugin.js
@@ -22,17 +22,19 @@ module.exports = (() => {
           "github_username": 'arg0NNY'
         }
       ],
-      "version": "1.1.1",
+      "version": "1.1.4",
       "description": "3 in 1: Shows the most recent message for each channel, brings channel list redesign from the new mobile UI and allows you to alter the sidebar width.",
       github: "https://github.com/arg0NNY/DiscordPlugins/tree/master/BetterChannelList",
       github_raw: "https://raw.githubusercontent.com/arg0NNY/DiscordPlugins/master/BetterChannelList/BetterChannelList.plugin.js"
     },
     "changelog": [
       {
-        "type": "added",
-        "title": "What's new",
+        "type": "fixed",
+        "title": "Fixed",
         "items": [
-          "Added support for ChannelsPreview V2."
+          "Fixed Discord crash when opening channel icon picker.",
+          "Fixed settings appearing blank.",
+          "Fixed calculating channel item height causing errors."
         ]
       }
     ]
@@ -153,7 +155,7 @@ module.exports = (() => {
       const DevToolsDesignTogglesStore = Webpack.getStore('DevToolsDesignTogglesStore')
       const EmojiPicker = Webpack.getModule(m => Filters.byStrings('pickerIntention')(m?.type?.render))
       const EmojiPickerIntentions = Webpack.getModule(Filters.byKeys('GUILD_STICKER_RELATED_EMOJI', 'SOUNDBOARD'), { searchExports: true })
-      const Alert = Webpack.getByStrings('messageType', 'CircleExclamationPointIcon')
+      const Alert = Webpack.getModule(Filters.byStrings('messageType', 'CircleWarningIcon'), { searchExports: true })
       const AlertMessageTypes = Webpack.getModule(Filters.byKeys('WARNING', 'POSITIVE'), { searchExports: true })
       const Flex = Webpack.getByKeys('Child', 'Direction')
 
@@ -866,6 +868,9 @@ module.exports = (() => {
               flex: 1;
               min-width: 0;
             }
+            .${Selectors.Base.sidebar}.${Selectors.Base.hidden} {
+              display: none;
+            }
           `)
         }
 
@@ -1040,7 +1045,7 @@ module.exports = (() => {
                 if (result === 0) return result
 
                 const [section, row] = props
-                if (section !== 0) {
+                if (section > 1) {
                   const { channel } = guildChannels.getChannelFromSectionRow(section, row) ?? {}
                   const emojiIconSize = this.settings.redesign.enabled && this.settings.redesign.iconSize
 
@@ -1215,7 +1220,7 @@ module.exports = (() => {
                             React.createElement(Flex.Child, {
                               children: React.createElement(Alert, {
                                 messageType: AlertMessageTypes.INFO,
-                                children: 'You can edit the channel emoji icons using their context menu.',
+                                children: 'Edit the channel emoji icons using their context menu.',
                                 className: !settings.redesign.enabled ? 'BCL--disabled' : null
                               })
                             }),

@@ -1,9 +1,9 @@
 {
     "currentVersionInfo": {
-        "version": "1.1.1",
+        "version": "1.1.4",
         "hasShownChangelog": true
     },
-    "sidebarWidth": 303,
+    "sidebarWidth": 295,
     "settings": {
         "lastMessage": {
             "enabled": false,

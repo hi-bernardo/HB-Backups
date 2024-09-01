@@ -4,8 +4,10 @@
     "BetterAnimations": true,
     "BetterAudioPlayer": true,
     "BetterBotTags": true,
+    "BetterChannelList": true,
     "BetterChatNames": true,
     "BetterFolders": true,
+    "BetterImageViewer": true,
     "BetterInvites": true,
     "BetterMediaPlayer": true,
     "BetterPictureInPicture": true,
@@ -21,8 +23,6 @@
     "ReadAllNotificationsButton": true,
     "ServerFolders": true,
     "ThemeRepo": true,
-    "YABDP4Nitro": true,
-    "BetterChannelList": true,
-    "BetterImageViewer": true,
-    "Uncompressed Images": true
+    "Uncompressed Images": true,
+    "YABDP4Nitro": true
 }

@@ -3,7 +3,7 @@
  * @author TenorTheHusky
  * @authorId 563652755814875146
  * @description A feature-rich BetterDiscord plugin that reworks the Discord UI to be significantly more modular
- * @version 8.4.0
+ * @version 8.4.6
  * @donate https://ko-fi.com/benjaminpryor
  * @patreon https://www.patreon.com/BenjaminPryor
  * @website https://github.com/programmer2514/BetterDiscord-CollapsibleUI
@@ -21,24 +21,20 @@ module.exports = (() => {
         github_username: 'programmer2514',
       },
       ],
-      version: '8.4.0',
+      version: '8.4.6',
       description: 'A feature-rich BetterDiscord plugin that reworks the Discord UI to be significantly more modular',
       github: 'https://github.com/programmer2514/BetterDiscord-CollapsibleUI',
       github_raw: 'https://raw.githubusercontent.com/programmer2514/BetterDiscord-CollapsibleUI/main/CollapsibleUI.plugin.js',
     },
     changelog: [{
-      title: '8.4.0',
+      title: '8.4.6',
       items: [
-        'Hotfix for newest Discord release (breaks plugin on Discord versions <304187)',
-        'Fixed some elements of new profiles being shown reversed',
-        'Fixed call container not filling available space while in fullscreen',
-        'Standardized code formatting using ESLint + Stylistic',
-        'Updated deprecated code',
+        'Hotfix for newest Discord release (breaks plugin on Discord versions <322979)',
       ],
     }, {
-      title: '1.0.0 - 8.4.0',
+      title: '1.0.0 - 8.4.5',
       items: [
-        `See the full changelog here:
+        `See the full changelog here:\
            https://programmer2514.github.io/?l=cui-changelog`,
       ],
     },
@@ -48,28 +44,8 @@ module.exports = (() => {
   // Check for ZeresPluginLibrary
   if (!window.ZeresPluginLibrary) {
     return class {
-      constructor() {
-        this._config = config;
-      }
-
-      getName() {
-        return config.info.name;
-      }
-
-      getAuthor() {
-        return config.info.authors.map(a => a.name).join(', ');
-      }
-
-      getDescription() {
-        return config.info.description;
-      }
-
-      getVersion() {
-        return config.info.version;
-      }
-
-      load() {
-        BdApi.showConfirmationModal(
+      load = () => {
+        BdApi.UI.showConfirmationModal(
           'Library Missing',
           `The library plugin needed for ${config.info.name} is missing. \
             Please click Download Now to install it.`, {
@@ -88,11 +64,10 @@ module.exports = (() => {
                   });
             },
           });
-      }
+      };
 
-      start() {}
-
-      stop() {}
+      start = () => {};
+      stop = () => {};
     };
   }
 
@@ -178,7 +153,8 @@ module.exports = (() => {
         // Volatile variables
         this.mouseX = 0;
         this.mouseY = 0;
-        this.isCollapsed = [true, true, true, true, true, true, true, true];
+        if (this.isCollapsed === undefined)
+          this.isCollapsed = [true, true, true, true, true, true, true, true];
 
         // Delay handlers
         this.serverDUDelay = false;
@@ -459,10 +435,10 @@ module.exports = (() => {
     abstractClassesAndElements = () => {
       // Classes
       if (this.classSelected === undefined) {
-        this.classSelected = 'selected_e44302';
-        this.classIconWrapper = 'iconWrapper_e44302';
-        this.classClickable = 'clickable_e44302';
-        this.classIcon = 'icon_e44302';
+        this.classSelected = 'selected_fc4f04';
+        this.classIconWrapper = 'iconWrapper_fc4f04';
+        this.classClickable = 'clickable_fc4f04';
+        this.classIcon = 'icon_fc4f04';
         this.classCallContainer = 'wrapper_d880dc';
         this.classCallUserWrapper = 'voiceCallWrapper_bae578';
         this.classDMElement = 'channel_c91bad';
@@ -481,10 +457,11 @@ module.exports = (() => {
         this.classUserPopout = 'userPopoutOuter_c69a7b';
         this.classMembersListWrapper = 'container_cbd271';
         this.classMembersListMember = 'member_a31c43';
+        this.classProfilePanel = 'userPanelOuter_c69a7b';
         this.classProfilePanelWrapper = 'profilePanel_b433b4';
         this.classTextInput = '[data-slate-string="true"]';
         this.classNoChat = 'noChat_a7d72e';
-        this.classMsgButtons = 'wrapper_ef319f';
+        this.classMsgButtons = 'wrapper_f7e168';
         this.classEphemeralContent = 'content_eed6a8';
         this.classUnreadDMBadge = 'numberBadge_df8943';
         this.classUnreadDmBadgeBase = 'base_df8943';
@@ -502,26 +479,27 @@ module.exports = (() => {
       // Elements
       this.windowBase = document.querySelector('.base_a4d4d9');
       this.baseLayer = document.querySelector('.baseLayer_d4b6c5');
-      this.toolBar = document.querySelector('.toolbar_e44302');
+      this.toolBar = document.querySelector('.toolbar_fc4f04');
       this.searchBar = document.querySelector('.search_ff5f90');
       this.inviteToolbar = document.querySelector('.inviteToolbar_c2739c');
       this.windowBar = document.querySelector('.typeWindows_a934d8');
       this.wordMark = document.querySelector('.wordmark_a934d8');
       this.msgBar = document.querySelector('.form_a7d72e');
       this.userArea = document.querySelector('.panels_a4d4d9');
-      this.profilePanel = document.querySelector('.userPanelOuter_c69a7b');
+      this.profilePanel = document.querySelector('.'
+        + this.classProfilePanel);
       this.profilePanelInner = document.querySelector('.userPanelInner_c69a7b')
         ?.firstElementChild;
-      this.profilePanelFooter = document.querySelector('.footer_be6801');
+      this.profilePanelFooter = document.querySelector('.footer_ecc60d');
       this.profilePanelWrapper = document.querySelector('.'
         + this.classProfilePanelWrapper);
-      this.profileBannerSVGWrapper = document.querySelector('.bannerSVGWrapper_b32cc2');
+      this.profileBannerSVGWrapper = document.querySelector('.mask_c3e427');
       this.membersList = document.querySelector('.' + this.classMembersList);
       this.serverList = document.querySelector('.' + this.classServerList);
       this.channelList = document.querySelector('.' + this.classChannelList);
       this.settingsContainerBase = document.querySelector('.container_b2ca13');
       this.settingsContainer = this.settingsContainerBase
-        .querySelector('.flex_bba380');
+        .querySelector('.flex_dc333f');
       this.spotifyContainer = document.querySelector('.container_6sXIoE');
       this.appWrapperOuter = document.querySelector('.app_bd26cc');
       this.avatarWrapper = document.querySelector('.avatarWrapper_b2ca13');
@@ -3951,286 +3929,306 @@ module.exports = (() => {
 
       // Read stored user data to decide active state of Server List button
       if (this.serverList) {
-        this.floatElement(this.I_SERVER_LIST, false);
-        if (this.buttonsOrder[this.I_SERVER_LIST] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'serverListButtonActive') === 'false') {
-            if (this.serverListButton)
-              this.serverListButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.serverList.style.display = 'none';
-            }
-            else {
-              this.serverList.style.width = this.collapsedDistance + 'px';
-              if (this.isDarkMatterLoaded) {
-                this.settingsContainerBase.style.width = '100%';
-                this.settingsContainerBase.style.left = '0px';
-                this.windowBase.style.minWidth = '100vw';
+        if (this.isCollapsed[this.I_SERVER_LIST]) {
+          this.floatElement(this.I_SERVER_LIST, false);
+          if (this.buttonsOrder[this.I_SERVER_LIST] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'serverListButtonActive') === 'false') {
+              if (this.serverListButton)
+                this.serverListButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.serverList.style.display = 'none';
+              }
+              else {
+                this.serverList.style.width = this.collapsedDistance + 'px';
+                if (this.isDarkMatterLoaded) {
+                  this.settingsContainerBase.style.width = '100%';
+                  this.settingsContainerBase.style.left = '0px';
+                  this.windowBase.style.minWidth = '100vw';
+                }
+              }
+              if (this.isHSLLoaded) {
+                this.windowBase.style.setProperty('top', '0px', 'important');
               }
             }
-            if (this.isHSLLoaded) {
-              this.windowBase.style.setProperty('top', '0px', 'important');
+            else if (BdApi.getData('CollapsibleUI', 'serverListButtonActive') === 'true') {
+              if (this.serverListButton)
+                this.serverListButton.classList.add(this.classSelected);
+            }
+            else {
+              BdApi.setData('CollapsibleUI', 'serverListButtonActive', 'true');
+              if (this.serverListButton)
+                this.serverListButton.classList.add(this.classSelected);
             }
           }
-          else if (BdApi.getData('CollapsibleUI', 'serverListButtonActive') === 'true') {
-            if (this.serverListButton)
-              this.serverListButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'serverListButtonActive', 'true');
-            if (this.serverListButton)
-              this.serverListButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'serverListButtonActive', 'true');
+        else this.floatElement(this.I_SERVER_LIST, true);
       }
 
       // Read stored user data to decide active state of Channel List button
       if (this.channelList) {
-        this.floatElement(this.I_CHANNEL_LIST, false);
-        if (this.buttonsOrder[this.I_CHANNEL_LIST] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'channelListButtonActive') === 'false') {
-            if (this.channelListButton)
-              this.channelListButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.channelList.style.display = 'none';
-            }
-            else {
-              this.channelList.style.transition = 'width ' + this.transitionSpeed + 'ms';
-              this.channelList.style.width = this.collapsedDistance + 'px';
-              if (this.isDarkMatterLoaded) {
-                this.settingsContainer.style.display = 'none';
-                if (this.spotifyContainer)
-                  this.spotifyContainer.style.display = 'none';
+        if (this.isCollapsed[this.I_CHANNEL_LIST]) {
+          this.floatElement(this.I_CHANNEL_LIST, false);
+          if (this.buttonsOrder[this.I_CHANNEL_LIST] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'channelListButtonActive') === 'false') {
+              if (this.channelListButton)
+                this.channelListButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.channelList.style.display = 'none';
+              }
+              else {
+                this.channelList.style.transition = 'width ' + this.transitionSpeed + 'ms';
+                this.channelList.style.width = this.collapsedDistance + 'px';
+                if (this.isDarkMatterLoaded) {
+                  this.settingsContainer.style.display = 'none';
+                  if (this.spotifyContainer)
+                    this.spotifyContainer.style.display = 'none';
+                }
               }
             }
+            else if (BdApi.getData('CollapsibleUI', 'channelListButtonActive') === 'true') {
+              if (this.channelListButton)
+                this.channelListButton.classList.add(this.classSelected);
+            }
+            else {
+              BdApi.setData('CollapsibleUI', 'channelListButtonActive', 'true');
+              if (this.channelListButton)
+                this.channelListButton.classList.add(this.classSelected);
+            }
           }
-          else if (BdApi.getData('CollapsibleUI', 'channelListButtonActive') === 'true') {
-            if (this.channelListButton)
-              this.channelListButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'channelListButtonActive', 'true');
-            if (this.channelListButton)
-              this.channelListButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'channelListButtonActive', 'true');
+        else this.floatElement(this.I_CHANNEL_LIST, true);
       }
 
       // Read stored user data to decide active state of Message Bar button
       if (this.msgBar) {
-        if (this.buttonsOrder[this.I_MSG_BAR] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'msgBarButtonActive') === 'false') {
-            if (this.msgBarButton)
-              this.msgBarButton.classList.remove(this.classSelected);
-            if (!(document.querySelector(this.classTextInput)?.innerHTML)) {
-              if (this.disableTransitions) {
-                this.msgBar.style.display = 'none';
-              }
-              else {
-                this.msgBar.style.maxHeight = this.collapsedDistance + 'px';
-                this.msgBar.style.overflow = 'hidden';
+        if (this.isCollapsed[this.I_MSG_BAR]) {
+          if (this.buttonsOrder[this.I_MSG_BAR] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'msgBarButtonActive') === 'false') {
+              if (this.msgBarButton)
+                this.msgBarButton.classList.remove(this.classSelected);
+              if (!(document.querySelector(this.classTextInput)?.innerHTML)) {
+                if (this.disableTransitions) {
+                  this.msgBar.style.display = 'none';
+                }
+                else {
+                  this.msgBar.style.maxHeight = this.collapsedDistance + 'px';
+                  this.msgBar.style.overflow = 'hidden';
+                }
               }
             }
+            else if (BdApi.getData('CollapsibleUI', 'msgBarButtonActive') === 'true') {
+              if (this.msgBarButton)
+                this.msgBarButton.classList.add(this.classSelected);
+            }
+            else {
+              BdApi.setData('CollapsibleUI', 'msgBarButtonActive', 'true');
+              if (this.msgBarButton)
+                this.msgBarButton.classList.add(this.classSelected);
+            }
           }
-          else if (BdApi.getData('CollapsibleUI', 'msgBarButtonActive') === 'true') {
-            if (this.msgBarButton)
-              this.msgBarButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'msgBarButtonActive', 'true');
-            if (this.msgBarButton)
-              this.msgBarButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'msgBarButtonActive', 'true');
       }
 
       // Read stored user data to decide active state of Window Bar button
       if (this.windowBar) {
-        if (this.buttonsOrder[this.I_WINDOW_BAR] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'windowBarButtonActive') === 'false') {
-            if (this.windowBarButton)
-              this.windowBarButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.windowBar.style.display = 'none';
+        if (this.isCollapsed[this.I_WINDOW_BAR]) {
+          if (this.buttonsOrder[this.I_WINDOW_BAR] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'windowBarButtonActive') === 'false') {
+              if (this.windowBarButton)
+                this.windowBarButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.windowBar.style.display = 'none';
+              }
+              else {
+                this.windowBar.style.height = '0px';
+                if (this.isDarkMatterLoaded)
+                  this.windowBar.style.opacity = '0';
+                this.windowBar.style.padding = '0px';
+                this.windowBar.style.margin = '0px';
+                this.windowBar.style.overflow = 'hidden';
+                this.wordMark.style.display = 'none';
+              }
+            }
+            else if (BdApi.getData('CollapsibleUI', 'windowBarButtonActive') === 'true') {
+              if (this.windowBarButton)
+                this.windowBarButton.classList.add(this.classSelected);
             }
             else {
-              this.windowBar.style.height = '0px';
-              if (this.isDarkMatterLoaded)
-                this.windowBar.style.opacity = '0';
-              this.windowBar.style.padding = '0px';
-              this.windowBar.style.margin = '0px';
-              this.windowBar.style.overflow = 'hidden';
-              this.wordMark.style.display = 'none';
+              BdApi.setData('CollapsibleUI', 'windowBarButtonActive', 'true');
+              if (this.windowBarButton)
+                this.windowBarButton.classList.add(this.classSelected);
             }
           }
-          else if (BdApi.getData('CollapsibleUI', 'windowBarButtonActive') === 'true') {
-            if (this.windowBarButton)
-              this.windowBarButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'windowBarButtonActive', 'true');
-            if (this.windowBarButton)
-              this.windowBarButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'windowBarButtonActive', 'true');
       }
 
       // Read stored user data to decide active state of Members List button
       if (this.membersList) {
-        this.floatElement(this.I_MEMBERS_LIST, false);
-        if (this.buttonsOrder[this.I_MEMBERS_LIST] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'membersListButtonActive') === 'false') {
-            if (this.membersListButton)
-              this.membersListButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.membersList.style.display = 'none';
-              if (this.membersListWrapper)
-                this.membersListWrapper.style.display = 'none';
+        if (this.isCollapsed[this.I_MEMBERS_LIST]) {
+          this.floatElement(this.I_MEMBERS_LIST, false);
+          if (this.buttonsOrder[this.I_MEMBERS_LIST] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'membersListButtonActive') === 'false') {
+              if (this.membersListButton)
+                this.membersListButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.membersList.style.display = 'none';
+                if (this.membersListWrapper)
+                  this.membersListWrapper.style.display = 'none';
+              }
+              else {
+                this.membersList.style.transition = 'width ' + this.transitionSpeed
+                  + 'ms, min-width ' + this.transitionSpeed + 'ms';
+                this.contentWindow.style.transition = 'max-width ' + this.transitionSpeed + 'ms';
+                this.membersList.style.width = this.collapsedDistance + 'px';
+                this.membersList.style.minWidth = this.collapsedDistance + 'px';
+                this.contentWindow.style.maxWidth = 'calc(100% - ' + this.collapsedDistance + 'px)';
+              }
+            }
+            else if (BdApi.getData('CollapsibleUI', 'membersListButtonActive') === 'true') {
+              if (this.membersListButton)
+                this.membersListButton.classList.add(this.classSelected);
+              if (this.membersListWidth != 0) {
+                this.membersList.style.width = this.membersListWidth + 'px';
+                this.membersList.style.minWidth = this.membersListWidth + 'px';
+                this.contentWindow.style.maxWidth = 'calc(100% - ' + this.membersListWidth + 'px)';
+              }
+              else {
+                this.membersList.style.width = 'var(--cui-members-width)';
+                this.membersList.style.minWidth = 'var(--cui-members-width)';
+                this.contentWindow.style.maxWidth = 'calc(100% - var(--cui-members-width))';
+              }
             }
             else {
-              this.membersList.style.transition = 'width ' + this.transitionSpeed
-                + 'ms, min-width ' + this.transitionSpeed + 'ms';
-              this.contentWindow.style.transition = 'max-width ' + this.transitionSpeed + 'ms';
-              this.membersList.style.width = this.collapsedDistance + 'px';
-              this.membersList.style.minWidth = this.collapsedDistance + 'px';
-              this.contentWindow.style.maxWidth = 'calc(100% - ' + this.collapsedDistance + 'px)';
+              BdApi.setData('CollapsibleUI', 'membersListButtonActive', 'true');
+              if (this.membersListButton)
+                this.membersListButton.classList.add(this.classSelected);
+              if (this.membersListWidth != 0) {
+                this.membersList.style.width = this.membersListWidth + 'px';
+                this.membersList.style.minWidth = this.membersListWidth + 'px';
+                this.contentWindow.style.maxWidth = 'calc(100% - ' + this.membersListWidth + 'px)';
+              }
+              else {
+                this.membersList.style.width = 'var(--cui-members-width)';
+                this.membersList.style.minWidth = 'var(--cui-members-width)';
+                this.contentWindow.style.maxWidth = 'calc(100% - var(--cui-members-width))';
+              }
             }
           }
-          else if (BdApi.getData('CollapsibleUI', 'membersListButtonActive') === 'true') {
-            if (this.membersListButton)
-              this.membersListButton.classList.add(this.classSelected);
-            if (this.membersListWidth != 0) {
-              this.membersList.style.width = this.membersListWidth + 'px';
-              this.membersList.style.minWidth = this.membersListWidth + 'px';
-              this.contentWindow.style.maxWidth = 'calc(100% - ' + this.membersListWidth + 'px)';
-            }
-            else {
-              this.membersList.style.width = 'var(--cui-members-width)';
-              this.membersList.style.minWidth = 'var(--cui-members-width)';
-              this.contentWindow.style.maxWidth = 'calc(100% - var(--cui-members-width))';
-            }
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'membersListButtonActive', 'true');
-            if (this.membersListButton)
-              this.membersListButton.classList.add(this.classSelected);
-            if (this.membersListWidth != 0) {
-              this.membersList.style.width = this.membersListWidth + 'px';
-              this.membersList.style.minWidth = this.membersListWidth + 'px';
-              this.contentWindow.style.maxWidth = 'calc(100% - ' + this.membersListWidth + 'px)';
-            }
-            else {
-              this.membersList.style.width = 'var(--cui-members-width)';
-              this.membersList.style.minWidth = 'var(--cui-members-width)';
-              this.contentWindow.style.maxWidth = 'calc(100% - var(--cui-members-width))';
-            }
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'membersListButtonActive', 'true');
+        else this.floatElement(this.I_MEMBERS_LIST, true);
       }
 
       // Read stored user data to decide active state of Profile Panel button
       if (this.profilePanel) {
-        this.floatElement(this.I_USER_PROFILE, false);
-        if (this.buttonsOrder[this.I_USER_PROFILE] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'profilePanelButtonActive') === 'false') {
-            if (this.profilePanelButton)
-              this.profilePanelButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.profilePanel.style.display = 'none';
+        if (this.isCollapsed[this.I_USER_PROFILE]) {
+          this.floatElement(this.I_USER_PROFILE, false);
+          if (this.buttonsOrder[this.I_USER_PROFILE] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'profilePanelButtonActive') === 'false') {
+              if (this.profilePanelButton)
+                this.profilePanelButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.profilePanel.style.display = 'none';
+              }
+              else {
+                this.profilePanel.style.transition = 'width ' + this.transitionSpeed
+                  + 'ms, min-width ' + this.transitionSpeed + 'ms';
+                this.profilePanel.style.width = this.collapsedDistance + 'px';
+              }
+            }
+            else if (BdApi.getData('CollapsibleUI', 'profilePanelButtonActive') === 'true') {
+              if (this.profilePanelButton)
+                this.profilePanelButton.classList.add(this.classSelected);
+              if (this.profilePanelWidth != 0)
+                this.profilePanel.style.width = this.profilePanelWidth + 'px';
+              else
+                this.profilePanel.style.width = 'var(--cui-profile-width)';
             }
             else {
-              this.profilePanel.style.transition = 'width ' + this.transitionSpeed
-                + 'ms, min-width ' + this.transitionSpeed + 'ms';
-              this.profilePanel.style.width = this.collapsedDistance + 'px';
+              BdApi.setData('CollapsibleUI', 'profilePanelButtonActive', 'true');
+              if (this.profilePanelButton)
+                this.profilePanelButton.classList.add(this.classSelected);
+              if (this.profilePanelWidth != 0)
+                this.profilePanel.style.width = this.profilePanelWidth + 'px';
+              else
+                this.profilePanel.style.width = 'var(--cui-profile-width)';
             }
           }
-          else if (BdApi.getData('CollapsibleUI', 'profilePanelButtonActive') === 'true') {
-            if (this.profilePanelButton)
-              this.profilePanelButton.classList.add(this.classSelected);
-            if (this.profilePanelWidth != 0)
-              this.profilePanel.style.width = this.profilePanelWidth + 'px';
-            else
-              this.profilePanel.style.width = 'var(--cui-profile-width)';
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'profilePanelButtonActive', 'true');
-            if (this.profilePanelButton)
-              this.profilePanelButton.classList.add(this.classSelected);
-            if (this.profilePanelWidth != 0)
-              this.profilePanel.style.width = this.profilePanelWidth + 'px';
-            else
-              this.profilePanel.style.width = 'var(--cui-profile-width)';
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'profilePanelButtonActive', 'true');
+        else this.floatElement(this.I_USER_PROFILE, true);
       }
 
       // Read stored user data to decide active state of User Area button
       if (this.userArea) {
-        if (this.buttonsOrder[this.I_USER_AREA] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'userAreaButtonActive') === 'false') {
-            if (this.userAreaButton)
-              this.userAreaButton.classList.remove(this.classSelected);
-            if (this.disableTransitions) {
-              this.userArea.style.display = 'none';
+        if (this.isCollapsed[this.I_USER_AREA]) {
+          if (this.buttonsOrder[this.I_USER_AREA] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'userAreaButtonActive') === 'false') {
+              if (this.userAreaButton)
+                this.userAreaButton.classList.remove(this.classSelected);
+              if (this.disableTransitions) {
+                this.userArea.style.display = 'none';
+              }
+              else {
+                this.userArea.style.maxHeight = this.collapsedDistance + 'px';
+              }
+            }
+            else if (BdApi.getData('CollapsibleUI', 'userAreaButtonActive') === 'true') {
+              if (this.userAreaButton)
+                this.userAreaButton.classList.add(this.classSelected);
             }
             else {
-              this.userArea.style.maxHeight = this.collapsedDistance + 'px';
+              BdApi.setData('CollapsibleUI', 'userAreaButtonActive', 'true');
+              if (this.userAreaButton)
+                this.userAreaButton.classList.add(this.classSelected);
             }
           }
-          else if (BdApi.getData('CollapsibleUI', 'userAreaButtonActive') === 'true') {
-            if (this.userAreaButton)
-              this.userAreaButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'userAreaButtonActive', 'true');
-            if (this.userAreaButton)
-              this.userAreaButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'userAreaButtonActive', 'true');
       }
 
       // Read stored user data to decide active state of Call Container button
       if (document.querySelector('.' + this.classCallContainer)) {
-        if (this.buttonsOrder[this.I_CALL_CONTAINER] || this.disabledButtonsStayCollapsed) {
-          if (BdApi.getData('CollapsibleUI', 'callContainerButtonActive') === 'false') {
-            if (this.callContainerButton)
-              this.callContainerButton.classList.remove(this.classSelected);
-            if (document.querySelector('.' + this.classCallContainer)) {
-              if (this.disableTransitions) {
-                document.querySelector('.' + this.classCallContainer).style.display = 'none';
-              }
-              else {
-                document.querySelector('.' + this.classCallContainer).style.maxHeight = '0px';
-                if (document.querySelector('.' + this.classCallUserWrapper))
-                  document.querySelector('.' + this.classCallUserWrapper).style.display = 'none';
+        if (this.isCollapsed[this.I_CALL_CONTAINER]) {
+          if (this.buttonsOrder[this.I_CALL_CONTAINER] || this.disabledButtonsStayCollapsed) {
+            if (BdApi.getData('CollapsibleUI', 'callContainerButtonActive') === 'false') {
+              if (this.callContainerButton)
+                this.callContainerButton.classList.remove(this.classSelected);
+              if (document.querySelector('.' + this.classCallContainer)) {
+                if (this.disableTransitions) {
+                  document.querySelector('.' + this.classCallContainer).style.display = 'none';
+                }
+                else {
+                  document.querySelector('.' + this.classCallContainer).style.maxHeight = '0px';
+                  if (document.querySelector('.' + this.classCallUserWrapper))
+                    document.querySelector('.' + this.classCallUserWrapper).style.display = 'none';
+                }
               }
             }
+            else if (BdApi.getData('CollapsibleUI', 'callContainerButtonActive') === 'true') {
+              if (this.callContainerButton)
+                this.callContainerButton.classList.add(this.classSelected);
+            }
+            else {
+              BdApi.setData('CollapsibleUI', 'callContainerButtonActive', 'true');
+              if (this.callContainerButton)
+                this.callContainerButton.classList.add(this.classSelected);
+            }
           }
-          else if (BdApi.getData('CollapsibleUI', 'callContainerButtonActive') === 'true') {
-            if (this.callContainerButton)
-              this.callContainerButton.classList.add(this.classSelected);
-          }
-          else {
+          else
             BdApi.setData('CollapsibleUI', 'callContainerButtonActive', 'true');
-            if (this.callContainerButton)
-              this.callContainerButton.classList.add(this.classSelected);
-          }
         }
-        else
-          BdApi.setData('CollapsibleUI', 'callContainerButtonActive', 'true');
       }
 
       // Apply transitions to UI elements

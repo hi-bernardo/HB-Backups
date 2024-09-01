@@ -1,8 +1,8 @@
 {
     "general": {
-        "voiceDisconnect": true,
+        "voiceDisconnect": false,
         "showToasts": false,
-        "mediaKeys": true,
+        "mediaKeys": false,
         "bdContextMenu": false
     },
     "addons": {
@@ -11,7 +11,7 @@
     },
     "customcss": {
         "customcss": true,
-        "liveUpdate": true,
+        "liveUpdate": false,
         "openAction": "settings"
     },
     "editor": {
@@ -32,7 +32,7 @@
         "devTools": false,
         "debuggerHotkey": false,
         "reactDevTools": false,
-        "inspectElement": true,
-        "devToolsWarning": true
+        "inspectElement": false,
+        "devToolsWarning": false
     }
 }
