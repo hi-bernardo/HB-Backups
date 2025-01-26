@@ -2,7 +2,7 @@
  * @name ThemeRepo
  * @author DevilBro
  * @authorId 278543574059057154
- * @version 2.5.7
+ * @version 2.6.0
  * @description Allows you to download all Themes from BD's Website within Discord
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
@@ -63,7 +63,7 @@ module.exports = (_ => {
 	} : (([Plugin, BDFDB]) => {
 		var _this;
 		
-		var list;
+		var list, listState;
 		
 		var loading, cachedThemes, grabbedThemes, generatorThemes, updateInterval, errorState;
 		var searchString, searchTimeout, forcedSort, forcedOrder, showOnlyOutdated;
@@ -139,18 +139,18 @@ module.exports = (_ => {
 						state: state
 					});
 				}).filter(n => n);
-				if (!this.props.updated) themes = themes.filter(theme => theme.state != themeStates.INSTALLED);
-				if (!this.props.outdated) themes = themes.filter(theme => theme.state != themeStates.OUTDATED);
-				if (!this.props.downloadable) themes = themes.filter(theme => theme.state != themeStates.DOWNLOADABLE);
+				if (!listState.updated) themes = themes.filter(theme => theme.state != themeStates.INSTALLED);
+				if (!listState.outdated) themes = themes.filter(theme => theme.state != themeStates.OUTDATED);
+				if (!listState.downloadable) themes = themes.filter(theme => theme.state != themeStates.DOWNLOADABLE);
 				if (searchString) {
 					let usedSearchString = searchString.toUpperCase();
 					let spacelessUsedSearchString = usedSearchString.replace(/\s/g, "");
 					themes = themes.filter(theme => theme.search.indexOf(usedSearchString) > -1 || theme.search.indexOf(spacelessUsedSearchString) > -1);
 				}
 				
-				BDFDB.ArrayUtils.keySort(themes, this.props.sortKey.toLowerCase());
-				if (this.props.orderKey == "DESC") themes.reverse();
-				if (reverseSorts.includes(this.props.sortKey)) themes.reverse();
+				BDFDB.ArrayUtils.keySort(themes, listState.sortKey.toLowerCase());
+				if (listState.orderKey == "DESC") themes.reverse();
+				if (reverseSorts.includes(listState.sortKey)) themes.reverse();
 				return themes;
 			}
 			createThemeFile(name, filename, body, autoloadKey) {
@@ -172,8 +172,8 @@ module.exports = (_ => {
 				}));
 			}
 			generateTheme(css) {
-				if (!css || !BDFDB.ObjectUtils.is(this.props.generatorValues)) return "";
-				for (let inputId in this.props.generatorValues) if (this.props.generatorValues[inputId].value && this.props.generatorValues[inputId].value.trim() && this.props.generatorValues[inputId].value != this.props.generatorValues[inputId].oldValue) css = css.replace(new RegExp(`--${BDFDB.StringUtils.regEscape(inputId)}(\\s*):(\\s*)${BDFDB.StringUtils.regEscape(this.props.generatorValues[inputId].oldValue)}`,"g"),`--${inputId}$1: $2${this.props.generatorValues[inputId].value}`);
+				if (!css || !BDFDB.ObjectUtils.is(listState.generatorValues)) return "";
+				for (let inputId in listState.generatorValues) if (listState.generatorValues[inputId].value && listState.generatorValues[inputId].value.trim() && listState.generatorValues[inputId].value != listState.generatorValues[inputId].oldValue) css = css.replace(new RegExp(`--${BDFDB.StringUtils.regEscape(inputId)}(\\s*):(\\s*)${BDFDB.StringUtils.regEscape(listState.generatorValues[inputId].oldValue)}`,"g"),`--${inputId}$1: $2${listState.generatorValues[inputId].value}`);
 				return css;
 			}
 			createFixerCSS(body) {
@@ -186,7 +186,9 @@ module.exports = (_ => {
 				return newCSS.replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\r/g, "\r");
 			}
 			render() {
-				if (!this.props.tab) this.props.tab = "Themes";
+				if (!listState) listState = this.props;
+				
+				if (!listState.tab) listState.tab = "Themes";
 				
 				const entries = (!loading.is && grabbedThemes.length ? this.filterThemes() : []);
 				
@@ -194,14 +196,14 @@ module.exports = (_ => {
 					lightSrc: "/assets/d6dfb89ab06b62044dbb.svg",
 					darkSrc: "/assets/8eeb59bba0a61cbffc41.svg",
 					text: "Could not load Theme Store due to an Issue with the BD Website"
-				} : !entries.length && !this.props.updated && !this.props.outdated && !this.props.downloadable ? {
+				} : !entries.length && !listState.updated && !listState.outdated && !listState.downloadable ? {
 					text: `You disabled all Filter Options in the "${BDFDB.LanguageUtils.LanguageStrings.SETTINGS}" Tab`
 				} : !entries.length && searchString ? {
 					lightSrc: "/assets/75081bdaad2d359c1469.svg",
 					darkSrc: "/assets/45cd76fed34c8e398cc8.svg"
 				} : !entries.length ? {} : null;
 				
-				if (forceRerenderGenerator && this.props.tab == "Generator") BDFDB.TimeUtils.timeout(_ => {
+				if (forceRerenderGenerator && listState.tab == "Generator") BDFDB.TimeUtils.timeout(_ => {
 					forceRerenderGenerator = false;
 					BDFDB.ReactUtils.forceUpdate(this);
 				});
@@ -219,6 +221,7 @@ module.exports = (_ => {
 										BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex.Child, {
 											grow: 1,
 											shrink: 0,
+											basis: "auto",
 											children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FormComponents.FormTitle, {
 												tag: BDFDB.LibraryComponents.FormComponents.FormTags.H1,
 												className: BDFDB.disCN.marginreset,
@@ -264,10 +267,10 @@ module.exports = (_ => {
 												className: BDFDB.disCN.tabbar,
 												itemClassName: BDFDB.disCN.tabbaritem,
 												type: BDFDB.LibraryComponents.TabBar.Types.TOP,
-												selectedItem: this.props.tab,
+												selectedItem: listState.tab,
 												items: [{value: "Themes"}, {value: "Generator"}, {value: BDFDB.LanguageUtils.LanguageStrings.SETTINGS}],
 												onItemSelect: value => {
-													this.props.tab = value;
+													listState.tab = value;
 													BDFDB.ReactUtils.forceUpdate(this);
 												}
 											})
@@ -276,15 +279,15 @@ module.exports = (_ => {
 											children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.QuickSelect, {
 												label: BDFDB.LanguageUtils.LibraryStrings.sort_by + ":",
 												value: {
-													label: sortKeys[this.props.sortKey],
-													value: this.props.sortKey
+													label: sortKeys[listState.sortKey],
+													value: listState.sortKey
 												},
 												options: Object.keys(sortKeys).map(key => ({
 													label: sortKeys[key],
 													value: key
 												})),
 												onChange: key => {
-													this.props.sortKey = key;
+													listState.sortKey = key;
 													BDFDB.ReactUtils.forceUpdate(this);
 												}
 											})
@@ -293,15 +296,15 @@ module.exports = (_ => {
 											children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.QuickSelect, {
 												label: BDFDB.LanguageUtils.LibraryStrings.order + ":",
 												value: {
-													label: BDFDB.LanguageUtils.LibraryStrings[orderKeys[this.props.orderKey]],
-													value: this.props.orderKey
+													label: BDFDB.LanguageUtils.LibraryStrings[orderKeys[listState.orderKey]],
+													value: listState.orderKey
 												},
 												options: Object.keys(orderKeys).map(key => ({
 													label: BDFDB.LanguageUtils.LibraryStrings[orderKeys[key]],
 													value: key
 												})),
 												onChange: key => {
-													this.props.orderKey = key;
+													listState.orderKey = key;
 													BDFDB.ReactUtils.forceUpdate(this);
 												}
 											})
@@ -315,7 +318,7 @@ module.exports = (_ => {
 							children: [
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
 									tab: "Themes",
-									open: this.props.tab == "Themes",
+									open: listState.tab == "Themes",
 									render: false,
 									children: loading.is ? BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex, {
 										direction: BDFDB.LibraryComponents.Flex.Direction.VERTICAL,
@@ -340,7 +343,7 @@ module.exports = (_ => {
 								}),
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
 									tab: "Generator",
-									open: this.props.tab == "Generator",
+									open: listState.tab == "Generator",
 									render: false,
 									children: [
 										BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsItem, {
@@ -348,26 +351,26 @@ module.exports = (_ => {
 											margin: 20,
 											label: "Choose a Generator Theme",
 											basis: "60%",
-											value: this.props.currentGenerator || "-----",
+											value: listState.currentGenerator || "-----",
 											options: [{value: "-----", label: "-----"}, nativeCSSvars && {value: "nativediscord", label: "Discord"}].concat(generatorThemes.map(t => ({value: t.id, label: t.name || "-----"})).sort((x, y) => (x.label < y.label ? -1 : x.label > y.label ? 1 : 0))).filter(n => n),
 											onChange: value => {
 												let generatorTheme = generatorThemes.find(t => t.id == value);
 												if (generatorTheme || value == "nativediscord") {
-													if (this.props.currentGenerator) forceRerenderGenerator = true;
-													this.props.currentGenerator = value;
-													this.props.currentGeneratorIsNative = value == "nativediscord";
-													this.props.generatorValues = {};
+													if (listState.currentGenerator) forceRerenderGenerator = true;
+													listState.currentGenerator = value;
+													listState.currentGeneratorIsNative = value == "nativediscord";
+													listState.generatorValues = {};
 												}
 												else {
-													delete this.props.currentGenerator;
-													delete this.props.currentGeneratorIsNative;
-													delete this.props.generatorValues;
+													delete listState.currentGenerator;
+													delete listState.currentGeneratorIsNative;
+													delete listState.generatorValues;
 												}
-												delete this.props.currentTheme;
+												delete listState.currentTheme;
 												BDFDB.ReactUtils.forceUpdate(this);
 											}
 										}),
-										!this.props.currentGenerator ? null : (forceRerenderGenerator ? BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex, {
+										!listState.currentGenerator ? null : (forceRerenderGenerator ? BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Flex, {
 											direction: BDFDB.LibraryComponents.Flex.Direction.VERTICAL,
 											justify: BDFDB.LibraryComponents.Flex.Justify.CENTER,
 											style: {marginTop: "50%"},
@@ -381,11 +384,11 @@ module.exports = (_ => {
 												label: "Download generated Theme",
 												children: "Download",
 												onClick: _ => {
-													if (this.props.currentGeneratorIsNative) {
+													if (listState.currentGeneratorIsNative) {
 														this.createThemeFile("Discord", "Discord.theme.css", `/**\n * @name Discord\n * @description Allow you to easily customize Discord's native Look  \n * @author DevilBro\n * @version 1.0.0\n * @authorId 278543574059057154\n * @invite Jx3TjNS\n * @donate https://www.paypal.me/MircoWittrien\n * @patreon https://www.patreon.com/MircoWittrien\n */\n\n` + this.generateTheme(nativeCSSvars), "startDownloaded");
 													}
 													else {
-														let generatorTheme = generatorThemes.find(t => t.id == this.props.currentGenerator);
+														let generatorTheme = generatorThemes.find(t => t.id == listState.currentGenerator);
 														if (generatorTheme) this.createThemeFile(generatorTheme.name, generatorTheme.rawSourceUrl.split("/").pop(), this.generateTheme(generatorTheme.fullCSS), "startDownloaded");
 													}
 												}
@@ -394,8 +397,8 @@ module.exports = (_ => {
 												className: BDFDB.disCN.marginbottom20
 											}),
 											(_ => {
-												let generatorTheme = generatorThemes.find(t => t.id == this.props.currentGenerator);
-												let vars = this.props.currentGeneratorIsNative ? nativeCSSvars.split(".theme-dark, .theme-light") : ((generatorTheme || {}).fullCSS || "").split(":root");
+												let generatorTheme = generatorThemes.find(t => t.id == listState.currentGenerator);
+												let vars = listState.currentGeneratorIsNative ? nativeCSSvars.split(".theme-dark, .theme-light") : ((generatorTheme || {}).fullCSS || "").split(":root");
 												if (vars.length < 2) return null;
 												vars = vars[1].replace(/\t\(/g, " (").replace(/\r|\t| {2,}/g, "").replace(/\/\*\n*((?!\/\*|\*\/).|\n)*\n+((?!\/\*|\*\/).|\n)*\n*\*\//g, "").replace(/\n\/\*.*?\*\//g, "").replace(/\n/g, "");
 												vars = vars.split("{");
@@ -426,7 +429,7 @@ module.exports = (_ => {
 															}
 														}
 														let varDescription = varStr.join("").replace(/\*\/|\/\*/g, "").replace(/:/g, ": ").replace(/: \//g, ":/").replace(/--/g, " --").replace(/\( --/g, "(--").trim();
-														this.props.generatorValues[varName] = {value: oldValue, oldValue};
+														listState.generatorValues[varName] = {value: oldValue, oldValue};
 														inputRefs.push(BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsItem, {
 															dividerBottom: vars[vars.length-1] != varStr,
 															type: "TextInput",
@@ -442,7 +445,7 @@ module.exports = (_ => {
 															placeholder: oldValue,
 															onChange: value => {
 																BDFDB.TimeUtils.clear(updateGeneratorTimeout);
-																updateGeneratorTimeout = BDFDB.TimeUtils.timeout(_ => this.props.generatorValues[varName] = {value, oldValue}, 1000);
+																updateGeneratorTimeout = BDFDB.TimeUtils.timeout(_ => listState.generatorValues[varName] = {value, oldValue}, 1000);
 															}
 														}));
 													}
@@ -454,7 +457,7 @@ module.exports = (_ => {
 								}),
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalTabContent, {
 									tab: BDFDB.LanguageUtils.LanguageStrings.SETTINGS,
-									open: this.props.tab == BDFDB.LanguageUtils.LanguageStrings.SETTINGS,
+									open: listState.tab == BDFDB.LanguageUtils.LanguageStrings.SETTINGS,
 									render: false,
 									children: [
 										BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SettingsPanelList, {
@@ -466,7 +469,7 @@ module.exports = (_ => {
 												label: _this.defaults.filters[key].description,
 												value: _this.settings.filters[key],
 												onChange: value => {
-													this.props[key] = _this.settings.filters[key] = value;
+													listState[key] = _this.settings.filters[key] = value;
 													BDFDB.ReactUtils.forceUpdate(this);
 												}
 											}))
@@ -513,23 +516,22 @@ module.exports = (_ => {
 												const url = this.props.data.thumbnailUrl;
 												const img = document.createElement("img");
 												img.addEventListener("load", function() {
-													BDFDB.LibraryModules.ModalUtils.openModal(modalData => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ModalComponents.ModalRoot, Object.assign({
-														className: BDFDB.disCN.imagemodal
-													}, modalData, {
-														size: BDFDB.LibraryComponents.ModalComponents.ModalSize.DYNAMIC,
-														"aria-label": BDFDB.LanguageUtils.LanguageStrings.IMAGE,
-														children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ImageModal, {
+													let modalData;
+													BDFDB.LibraryModules.ModalUtils.openModal(m => modalData = m, {Layer: _ => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.ImageModalOuter, {
+														onClose: modalData.onClose,
+														className: BDFDB.disCN.imagemodal,
+														items: [{
 															animated: false,
-															src: url,
-															original: url,
-															width: this.width,
 															height: this.height,
-															className: BDFDB.disCN.imagemodalimage,
-															shouldAnimate: true,
-															renderForwardComponent: _ => {},
-															renderLinkComponent: props => BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Anchor, props)
-														})
-													}), true));
+															original: url,
+															srcIsAnimated: false,
+															trigger: "CLICK",
+															type: "IMAGE",
+															url: url,
+															width: this.width,
+															zoomThumbnailPlaceholder: url
+														}]
+													}, true)});
 												});
 												img.src = url;
 											}
@@ -1069,191 +1071,191 @@ module.exports = (_ => {
 				switch (BDFDB.LanguageUtils.getLanguage().id) {
 					case "bg":		// Bulgarian
 						return {
-							list:								"Списък",
+							list:						"Списък",
 							notice_failed_themes:				"Някои Themes [{{var0}}] не можаха да бъдат заредени",
-							notice_new_themes:					"Новите Themes [{{var0}}] бяха добавени към Theme Repo",
+							notice_new_themes:				"Новите Themes [{{var0}}] бяха добавени към Theme Repo",
 							notice_outdated_themes:				"Някои Themes [{{var0}}] са остарели"
 						};
 					case "da":		// Danish
 						return {
-							list:								"Liste",
+							list:						"Liste",
 							notice_failed_themes:				"Nogle Themes [{{var0}}] kunne ikke indlæses",
-							notice_new_themes:					"Nye Themes [{{var0}}] er blevet føjet til Theme Repo",
+							notice_new_themes:				"Nye Themes [{{var0}}] er blevet føjet til Theme Repo",
 							notice_outdated_themes:				"Nogle Themes [{{var0}}] er forældede"
 						};
 					case "de":		// German
 						return {
-							list:								"Liste",
+							list:						"Liste",
 							notice_failed_themes:				"Einige Themes [{{var0}}] konnten nicht geladen werden",
-							notice_new_themes:					"Neue Themes [{{var0}}] wurden zur Theme Repo hinzugefügt",
+							notice_new_themes:				"Neue Themes [{{var0}}] wurden zur Theme Repo hinzugefügt",
 							notice_outdated_themes:				"Einige Themes [{{var0}}] sind veraltet"
 						};
 					case "el":		// Greek
 						return {
-							list:								"Λίστα",
+							list:						"Λίστα",
 							notice_failed_themes:				"Ορισμένα Θέματα [{{var0}}] δεν μπορούν να φορτωθούν",
-							notice_new_themes:					"Νέα Θέματα [{{var0}}] προστέθηκαν στο Απωθετήριο Θεμάτων",
+							notice_new_themes:				"Νέα Θέματα [{{var0}}] προστέθηκαν στο Απωθετήριο Θεμάτων",
 							notice_outdated_themes:				"Ορισμένα Θέματα [{{var0}}] είναι παλαιά"
 						};
 					case "es":		// Spanish
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Algunos Themes [{{var0}}] no se pudieron cargar",
-							notice_new_themes:					"Se han agregado nuevos Themes [{{var0}}] a Theme Repo",
+							notice_new_themes:				"Se han agregado nuevos Themes [{{var0}}] a Theme Repo",
 							notice_outdated_themes:				"Algunas Themes [{{var0}}] están desactualizadas"
 						};
 					case "fi":		// Finnish
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Joitain kohdetta Themes [{{var0}}] ei voitu ladata",
-							notice_new_themes:					"Uusi Themes [{{var0}}] on lisätty Theme Repo",
+							notice_new_themes:				"Uusi Themes [{{var0}}] on lisätty Theme Repo",
 							notice_outdated_themes:				"Jotkut Themes [{{var0}}] ovat vanhentuneita"
 						};
 					case "fr":		// French
 						return {
-							list:								"Liste",
+							list:						"Liste",
 							notice_failed_themes:				"Certains Themes [{{var0}}] n'ont pas pu être chargés",
-							notice_new_themes:					"De nouveaux Themes [{{var0}}] ont été ajoutés à Theme Repo",
+							notice_new_themes:				"De nouveaux Themes [{{var0}}] ont été ajoutés à Theme Repo",
 							notice_outdated_themes:				"Certains Themes [{{var0}}] sont obsolètes"
 						};
 					case "hr":		// Croatian
 						return {
-							list:								"Popis",
+							list:						"Popis",
 							notice_failed_themes:				"Neke datoteke Themes [{{var0}}] nije moguće učitati",
-							notice_new_themes:					"Novi Themes [{{var0}}] dodani su u Theme Repo",
+							notice_new_themes:				"Novi Themes [{{var0}}] dodani su u Theme Repo",
 							notice_outdated_themes:				"Neki su Themes [{{var0}}] zastarjeli"
 						};
 					case "hu":		// Hungarian
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Néhány Themes [{{var0}}] nem sikerült betölteni",
-							notice_new_themes:					"Új Themes [{{var0}}] hozzáadva a következőhöz: Theme Repo",
+							notice_new_themes:				"Új Themes [{{var0}}] hozzáadva a következőhöz: Theme Repo",
 							notice_outdated_themes:				"Néhány Themes [{{var0}}] elavult"
 						};
 					case "it":		// Italian
 						return {
-							list:								"Elenco",
+							list:						"Elenco",
 							notice_failed_themes:				"Impossibile caricare alcuni Themes [{{var0}}] ",
-							notice_new_themes:					"Il nuovo Themes [{{var0}}] è stato aggiunto a Theme Repo",
+							notice_new_themes:				"Il nuovo Themes [{{var0}}] è stato aggiunto a Theme Repo",
 							notice_outdated_themes:				"Alcuni Themes [{{var0}}] non sono aggiornati"
 						};
 					case "ja":		// Japanese
 						return {
-							list:								"リスト",
+							list:						"リスト",
 							notice_failed_themes:				"一部の Themes [{{var0}}] を読み込めませんでした",
-							notice_new_themes:					"新しい Themes [{{var0}}] が Theme Repo に追加されました",
+							notice_new_themes:				"新しい Themes [{{var0}}] が Theme Repo に追加されました",
 							notice_outdated_themes:				"一部の Themes [{{var0}}] は古くなっています"
 						};
 					case "ko":		// Korean
 						return {
-							list:								"명부",
+							list:						"명부",
 							notice_failed_themes:				"일부 Themes [{{var0}}] 을 (를)로드 할 수 없습니다.",
-							notice_new_themes:					"새 Themes [{{var0}}] 이 Theme Repo 에 추가되었습니다.",
+							notice_new_themes:				"새 Themes [{{var0}}] 이 Theme Repo 에 추가되었습니다.",
 							notice_outdated_themes:				"일부 Themes [{{var0}}] 이 오래되었습니다."
 						};
 					case "lt":		// Lithuanian
 						return {
-							list:								"Sąrašas",
+							list:						"Sąrašas",
 							notice_failed_themes:				"Kai kurių Themes [{{var0}}] nepavyko įkelti",
-							notice_new_themes:					"Naujas Themes [{{var0}}] pridėtas prie Theme Repo",
+							notice_new_themes:				"Naujas Themes [{{var0}}] pridėtas prie Theme Repo",
 							notice_outdated_themes:				"Kai kurie Themes [{{var0}}] yra pasenę"
 						};
 					case "nl":		// Dutch
 						return {
-							list:								"Lijst",
+							list:						"Lijst",
 							notice_failed_themes:				"Sommige Themes [{{var0}}] konden niet worden geladen",
-							notice_new_themes:					"Nieuwe Themes [{{var0}}] zijn toegevoegd aan de Theme Repo",
+							notice_new_themes:				"Nieuwe Themes [{{var0}}] zijn toegevoegd aan de Theme Repo",
 							notice_outdated_themes:				"Sommige Themes [{{var0}}] zijn verouderd"
 						};
 					case "no":		// Norwegian
 						return {
-							list:								"Liste",
+							list:						"Liste",
 							notice_failed_themes:				"Noen Themes [{{var0}}] kunne ikke lastes inn",
-							notice_new_themes:					"Nye Themes [{{var0}}] er lagt til i Theme Repo",
+							notice_new_themes:				"Nye Themes [{{var0}}] er lagt til i Theme Repo",
 							notice_outdated_themes:				"Noen Themes [{{var0}}] er utdaterte"
 						};
 					case "pl":		// Polish
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Nie można załadować niektórych Themes [{{var0}}] ",
-							notice_new_themes:					"Nowe Themes [{{var0}}] zostały dodane do Theme Repo",
+							notice_new_themes:				"Nowe Themes [{{var0}}] zostały dodane do Theme Repo",
 							notice_outdated_themes:				"Niektóre Themes [{{var0}}] są nieaktualne"
 						};
 					case "pt-BR":	// Portuguese (Brazil)
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Algum Themes [{{var0}}] não pôde ser carregado",
-							notice_new_themes:					"Novo Themes [{{var0}}] foi adicionado ao Theme Repo",
+							notice_new_themes:				"Novo Themes [{{var0}}] foi adicionado ao Theme Repo",
 							notice_outdated_themes:				"Alguns Themes [{{var0}}] estão desatualizados"
 						};
 					case "ro":		// Romanian
 						return {
-							list:								"Listă",
+							list:						"Listă",
 							notice_failed_themes:				"Unele Themes [{{var0}}] nu au putut fi încărcate",
-							notice_new_themes:					"Themes [{{var0}}] nou au fost adăugate la Theme Repo",
+							notice_new_themes:				"Themes [{{var0}}] nou au fost adăugate la Theme Repo",
 							notice_outdated_themes:				"Unele Themes [{{var0}}] sunt învechite"
 						};
 					case "ru":		// Russian
 						return {
-							list:								"Список",
+							list:						"Список",
 							notice_failed_themes:				"Не удалось загрузить некоторые Themes [{{var0}}] ",
-							notice_new_themes:					"Новые Themes [{{var0}}] добавлены в Theme Repo",
+							notice_new_themes:				"Новые Themes [{{var0}}] добавлены в Theme Repo",
 							notice_outdated_themes:				"Некоторые Themes [{{var0}}] устарели"
 						};
 					case "sv":		// Swedish
 						return {
-							list:								"Lista",
+							list:						"Lista",
 							notice_failed_themes:				"Vissa Themes [{{var0}}] kunde inte laddas",
-							notice_new_themes:					"Nya Themes [{{var0}}] har lagts till i Theme Repo",
+							notice_new_themes:				"Nya Themes [{{var0}}] har lagts till i Theme Repo",
 							notice_outdated_themes:				"Vissa Themes [{{var0}}] är föråldrade"
 						};
 					case "th":		// Thai
 						return {
-							list:								"รายการ",
+							list:						"รายการ",
 							notice_failed_themes:				"ไม่สามารถโหลด Themes [{{var0}}] บางรายการได้",
-							notice_new_themes:					"เพิ่ม Themes [{{var0}}] ใหม่ใน Theme Repo แล้ว",
+							notice_new_themes:				"เพิ่ม Themes [{{var0}}] ใหม่ใน Theme Repo แล้ว",
 							notice_outdated_themes:				"Themes [{{var0}}] บางรายการล้าสมัย"
 						};
 					case "tr":		// Turkish
 						return {
-							list:								"Liste",
+							list:						"Liste",
 							notice_failed_themes:				"Bazı Themes [{{var0}}] yüklenemedi",
-							notice_new_themes:					"Yeni Themes [{{var0}}], Theme Repo 'ye eklendi",
+							notice_new_themes:				"Yeni Themes [{{var0}}], Theme Repo 'ye eklendi",
 							notice_outdated_themes:				"Bazı Themes [{{var0}}] güncel değil"
 						};
 					case "uk":		// Ukrainian
 						return {
-							list:								"Список",
+							list:						"Список",
 							notice_failed_themes:				"Деякі Themes [{{var0}}] не вдалося завантажити",
-							notice_new_themes:					"Нові Themes [{{var0}}] були додані до Theme Repo",
+							notice_new_themes:				"Нові Themes [{{var0}}] були додані до Theme Repo",
 							notice_outdated_themes:				"Деякі Themes [{{var0}}] застарілі"
 						};
 					case "vi":		// Vietnamese
 						return {
-							list:								"Danh sách",
+							list:						"Danh sách",
 							notice_failed_themes:				"Không thể tải một số Themes [{{var0}}] ",
-							notice_new_themes:					"Themes [{{var0}}] mới đã được thêm vào Theme Repo",
+							notice_new_themes:				"Themes [{{var0}}] mới đã được thêm vào Theme Repo",
 							notice_outdated_themes:				"Một số Themes [{{var0}}] đã lỗi thời"
 						};
 					case "zh-CN":	// Chinese (China)
 						return {
-							list:								"清单",
+							list:						"清单",
 							notice_failed_themes:				"某些 Themes [{{var0}}] 无法加载",
-							notice_new_themes:					"新的 Themes [{{var0}}] 已添加到 Theme Repo",
+							notice_new_themes:				"新的 Themes [{{var0}}] 已添加到 Theme Repo",
 							notice_outdated_themes:				"一些 Themes [{{var0}}] 已过时"
 						};
 					case "zh-TW":	// Chinese (Taiwan)
 						return {
-							list:								"清單",
+							list:						"清單",
 							notice_failed_themes:				"某些 Themes [{{var0}}] 無法加載",
-							notice_new_themes:					"新的 Themes [{{var0}}] 已添加到 Theme Repo",
+							notice_new_themes:				"新的 Themes [{{var0}}] 已添加到 Theme Repo",
 							notice_outdated_themes:				"一些 Themes [{{var0}}] 已過時"
 						};
 					default:		// English
 						return {
-							list:								"List",
+							list:						"List",
 							notice_failed_themes:				"Some Themes [{{var0}}] could not be loaded",
-							notice_new_themes:					"New Themes [{{var0}}] have been added to the Theme Repo",
+							notice_new_themes:				"New Themes [{{var0}}] have been added to the Theme Repo",
 							notice_outdated_themes:				"Some Themes [{{var0}}] are outdated"
 						};
 				}

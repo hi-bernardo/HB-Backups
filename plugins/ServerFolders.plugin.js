@@ -2,7 +2,7 @@
  * @name ServerFolders
  * @author DevilBro
  * @authorId 278543574059057154
- * @version 7.2.3
+ * @version 7.2.8
  * @description Changes Discord's Folders, Servers open in a new Container, also adds extra Features to more easily organize, customize and manage your Folders
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
@@ -119,9 +119,11 @@ module.exports = (_ => {
 										folderIcon = folderIcons[data.iconID] ? (!folderIcons[data.iconID].customID ? _this.createBase64SVG(folderIcons[data.iconID].openicon, data.color1, data.color2) : folderIcons[data.iconID].openicon) : null;
 										folderIcon = folderIcon ? BDFDB.ReactUtils.createElement("div", {
 											className: BDFDB.disCN.guildfoldericonwrapper,
+											onClick: _ => BDFDB.LibraryModules.GuildUtils.toggleGuildFolderExpand(folder.folderId),
 											style: {background: `url(${folderIcon}) center/cover no-repeat`}
 										}) : BDFDB.ReactUtils.createElement("div", {
 											className: BDFDB.disCN.guildfoldericonwrapper,
+											onClick: _ => BDFDB.LibraryModules.GuildUtils.toggleGuildFolderExpand(folder.folderId),
 											children: BDFDB.ReactUtils.createElement("div", {
 												className: BDFDB.disCN.guildfoldericonwrapperexpanded,
 												children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
@@ -356,7 +358,6 @@ module.exports = (_ => {
 				}
 			}
 			render() {
-				let openInput, closeInput;
 				return [
 					BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.FormComponents.FormItem, {
 						title: _this.labels.modal_customopen,
@@ -365,7 +366,6 @@ module.exports = (_ => {
 							type: "file",
 							filter: "image",
 							value: this.props.open,
-							ref: instance => {if (instance) openInput = instance;},
 							onChange: value => {
 								this.props.open = value;
 								BDFDB.ReactUtils.forceUpdate(this);
@@ -379,7 +379,6 @@ module.exports = (_ => {
 							type: "file",
 							filter: "image",
 							value: this.props.closed,
-							ref: instance => {if (instance) closeInput = instance;},
 							onChange: value => {
 								this.props.closed = value;
 								BDFDB.ReactUtils.forceUpdate(this);
@@ -417,9 +416,9 @@ module.exports = (_ => {
 								BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Button, {
 									children: BDFDB.LanguageUtils.LanguageStrings.ADD,
 									onClick: _ => {
-										if (openInput.props.value && closeInput.props.value) {
-											this.checkImage(openInput.props.value, openIcon => {
-												this.checkImage(closeInput.props.value, closedIcon => {
+										if (this.props.open && this.props.closed) {
+											this.checkImage(this.props.open, openIcon => {
+												this.checkImage(this.props.closed, closedIcon => {
 													customIcons[_this.generateId("customicon")] = {openicon: openIcon, closedicon: closedIcon};
 													BDFDB.DataUtils.save(customIcons, _this, "customicons");
 													this.props.open = null;
@@ -543,7 +542,6 @@ module.exports = (_ => {
 						display: none !important;
 					}
 					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfolder} {
-						cursor: default;
 						border-radius: 100%;
 					}
 				`;
@@ -722,24 +720,38 @@ module.exports = (_ => {
 						folderGuildContent.props.themeOverride = e.instance.props.themeOverride;
 						BDFDB.ReactUtils.forceUpdate(folderGuildContent);
 					}
-					let topBar = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.guildswrapperunreadmentionsbartop]]});
-					if (topBar) {
-						let topIsVisible = topBar.props.isVisible;
-						topBar.props.isVisible = BDFDB.TimeUtils.suppress((...args) => {
-							let ids = BDFDB.LibraryStores.SortedGuildStore.getGuildFolders().filter(n => n.folderId).map(n => n.guildIds).flat(10);
-							args[2] = args[2].filter(id => !ids.includes(id));
-							return topIsVisible(...args) || ids.includes(args[0]) && BDFDB.LibraryStores.GuildReadStateStore.getMentionCount(args[0]) == 0;
-						}, "Error in isVisible of Top Bar in Guild List!");
+					
+					const process = returnValue => {
+						let topBar = BDFDB.ReactUtils.findChild(returnValue, {props: [["className", BDFDB.disCN.guildswrapperunreadmentionsbartop]]});
+						if (topBar) {
+							let topIsVisible = topBar.props.isVisible;
+							topBar.props.isVisible = BDFDB.TimeUtils.suppress((...args) => {
+								let ids = BDFDB.LibraryStores.SortedGuildStore.getGuildFolders().filter(n => n.folderId).map(n => n.guildIds).flat(10);
+								args[2] = args[2].filter(id => !ids.includes(id));
+								return topIsVisible(...args) || ids.includes(args[0]) && BDFDB.LibraryStores.GuildReadStateStore.getMentionCount(args[0]) == 0;
+							}, "Error in isVisible of Top Bar in Guild List!");
+						}
+						let bottomBar = BDFDB.ReactUtils.findChild(returnValue, {props: [["className", BDFDB.disCN.guildswrapperunreadmentionsbarbottom]]});
+						if (bottomBar) {
+							let bottomIsVisible = bottomBar.props.isVisible;
+							bottomBar.props.isVisible = BDFDB.TimeUtils.suppress((...args) => {
+								let ids = BDFDB.LibraryStores.SortedGuildStore.getGuildFolders().filter(n => n.folderId).map(n => n.guildIds).flat(10);
+								args[2] = args[2].filter(id => !ids.includes(id));
+								return bottomIsVisible(...args) || ids.includes(args[0]) && BDFDB.LibraryStores.GuildReadStateStore.getMentionCount(args[0]) == 0;
+							}, "Error in isVisible of Bottom Bar in Guild List!");
+						}
+					};
+					let themeWrapper = BDFDB.ReactUtils.findChild(e.returnvalue, {filter: n => n && n.props && typeof n.props.children == "function"});
+					if (themeWrapper) {
+						let childrenRender = themeWrapper.props.children;
+						themeWrapper.props.children = BDFDB.TimeUtils.suppress((...args) => {
+							let children = childrenRender(...args);
+							process(children);
+							return children;
+						}, "Error in Children Render of Theme Wrapper!", this);
 					}
-					let bottomBar = BDFDB.ReactUtils.findChild(e.returnvalue, {props: [["className", BDFDB.disCN.guildswrapperunreadmentionsbarbottom]]});
-					if (bottomBar) {
-						let bottomIsVisible = bottomBar.props.isVisible;
-						bottomBar.props.isVisible = BDFDB.TimeUtils.suppress((...args) => {
-							let ids = BDFDB.LibraryStores.SortedGuildStore.getGuildFolders().filter(n => n.folderId).map(n => n.guildIds).flat(10);
-							args[2] = args[2].filter(id => !ids.includes(id));
-							return bottomIsVisible(...args) || ids.includes(args[0]) && BDFDB.LibraryStores.GuildReadStateStore.getMentionCount(args[0]) == 0;
-						}, "Error in isVisible of Bottom Bar in Guild List!");
-					}
+					else process(e.returnvalue);
+					
 					e.returnvalue = [
 						e.returnvalue,
 						BDFDB.ReactUtils.createElement(FolderGuildContentComponent, {
@@ -843,6 +855,7 @@ module.exports = (_ => {
 			}
 			
 			processGuildItem (e) {
+				if (!e.instance.props.guild || typeof e.instance.props?.children?.props?.className != "string" || e.instance.props?.children?.props?.className.indexOf(BDFDB.disCN.guildcontainer) == -1) return;
 				BDFDB.TimeUtils.clear(forceCloseTimeout);
 				forceCloseTimeout = BDFDB.TimeUtils.timeout(_ => {
 					let newCurrentGuild = BDFDB.LibraryStores.SelectedGuildStore.getGuildId();
@@ -863,8 +876,7 @@ module.exports = (_ => {
 					guildStates[e.instance.props.guild.id] = state;
 					if (e.returnvalue) {
 						let data = this.getFolderConfig(folder.folderId);
-						let [children, index] = BDFDB.ReactUtils.findParent(e.returnvalue, {name: ["GuildTooltip", "BDFDB_TooltipContainer"]});
-						if (index > -1) children[index] = BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
+						e.returnvalue = BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
 							tooltipConfig: Object.assign({
 								type: "right",
 								list: true,
@@ -874,7 +886,7 @@ module.exports = (_ => {
 								backgroundColor: data.color3,
 								fontColor: data.color4,
 							}),
-							children: children[index].props.children
+							children: typeof e.returnvalue.props.children == "function" ? e.instance.props.children : e.returnvalue.props.children
 						});
 					}
 				}

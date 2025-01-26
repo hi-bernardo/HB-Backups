@@ -1,5 +1,5 @@
 {
-    "version": "1.10.2",
+    "version": "1.11.0",
     "drawerStates": {
         "settings": {
             "addons": false,
@@ -12,7 +12,8 @@
     },
     "addonlistControls": {
         "plugin": {
-            "view": "grid"
+            "view": "grid",
+            "sort": "isEnabled"
         }
     }
 }

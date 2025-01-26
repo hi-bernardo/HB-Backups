@@ -2,7 +2,7 @@
 	"all": {
 		"detailsSettings": {
 			"footnote": true,
-			"tooltip": false,
+			"tooltip": true,
 			"tooltipDelay": 0
 		},
 		"engines": {
@@ -39,7 +39,7 @@
 			"wmv": true
 		},
 		"general": {
-			"nsfwMode": false
+			"nsfwMode": true
 		},
 		"places": {
 			"userAvatars": true,
@@ -49,8 +49,8 @@
 			"emojis": true
 		},
 		"rescaleSettings": {
-			"messages": "NONE",
 			"imageViewer": "NONE",
+			"messages": "ORIGINAL",
 			"rescaleEmbeds": true
 		},
 		"viewerSettings": {
@@ -62,9 +62,9 @@
 			"jumpTo": true
 		},
 		"zoomSettings": {
-			"pixelMode": false,
-			"clickMode": false,
-			"lensSize": 200,
+			"clickMode": true,
+			"lensSize": 5000,
+			"pixelMode": true,
 			"zoomLevel": 2,
 			"zoomSpeed": 0.1
 		}

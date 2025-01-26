@@ -7,13 +7,13 @@
     "BetterChannelList": true,
     "BetterChatNames": true,
     "BetterFolders": true,
-    "BetterImageViewer": true,
+    "BetterImageViewer": false,
     "BetterInvites": true,
     "BetterMediaPlayer": true,
     "BetterPictureInPicture": true,
     "BetterSearchPage": true,
     "BetterSyntax": true,
-    "BlurNSFW": true,
+    "BlurNSFW": false,
     "ChannelsBadges": true,
     "CollapsibleUI": true,
     "Embed More Images": true,
@@ -24,5 +24,8 @@
     "ServerFolders": true,
     "ThemeRepo": true,
     "Uncompressed Images": true,
-    "YABDP4Nitro": true
+    "YABDP4Nitro": true,
+    "PinchToZoom": false,
+    "PrettyFolders": true,
+    "VoiceUsersCounter": true
 }
