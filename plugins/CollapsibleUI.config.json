@@ -1,0 +1,108 @@
+{
+    "currentVersionInfo": {
+        "version": "8.4.6",
+        "hasShownChangelog": true
+    },
+    "version": "10.0.1",
+    "settings-version": "15",
+    "transition-speed": "150",
+    "collapse-toolbar": "cui",
+    "collapse-settings": false,
+    "message-input-collapse": true,
+    "resizable-channel-list": true,
+    "resizable-members-list": true,
+    "resizable-user-profile": true,
+    "unread-dms-badge": false,
+    "keyboard-shortcuts": true,
+    "server-list-shortcut": [
+        "Alt",
+        "s"
+    ],
+    "channel-list-shortcut": [
+        "Alt",
+        "c"
+    ],
+    "members-list-shortcut": [
+        "Alt",
+        "m"
+    ],
+    "user-profile-shortcut": [
+        "Alt",
+        "p"
+    ],
+    "message-input-shortcut": [
+        "Alt",
+        "i"
+    ],
+    "window-bar-shortcut": [
+        "Alt",
+        "w"
+    ],
+    "call-window-shortcut": [
+        "Alt",
+        "v"
+    ],
+    "user-area-shortcut": [
+        "Alt",
+        "u"
+    ],
+    "collapse-disabled-buttons": false,
+    "server-list-button-index": 1,
+    "channel-list-button-index": 2,
+    "members-list-button-index": 4,
+    "user-profile-button-index": 5,
+    "message-input-button-index": 3,
+    "window-bar-button-index": 0,
+    "call-window-button-index": 6,
+    "user-area-button-index": 0,
+    "expand-on-hover": true,
+    "floating-panels": true,
+    "server-list-expand-on-hover": true,
+    "channel-list-expand-on-hover": true,
+    "members-list-expand-on-hover": true,
+    "user-profile-expand-on-hover": true,
+    "message-input-expand-on-hover": true,
+    "window-bar-expand-on-hover": true,
+    "call-window-expand-on-hover": true,
+    "user-area-expand-on-hover": true,
+    "size-collapse": false,
+    "server-list-threshold": 500,
+    "channel-list-threshold": 600,
+    "members-list-threshold": 950,
+    "user-profile-threshold": 1000,
+    "message-input-threshold": 400,
+    "window-bar-threshold": 200,
+    "call-window-threshold": 550,
+    "user-area-threshold": 400,
+    "conditional-collapse": false,
+    "server-list-conditional": "",
+    "channel-list-conditional": "",
+    "members-list-conditional": "",
+    "user-profile-conditional": "",
+    "message-input-conditional": "",
+    "window-bar-conditional": "",
+    "call-window-conditional": "",
+    "user-area-conditional": "",
+    "collapse-size": 0,
+    "button-collapse-fudge-factor": 10,
+    "expand-on-hover-delay": 15,
+    "expand-on-hover-opening-fudge-factor": 30,
+    "expand-on-hover-closing-fudge-factor": 30,
+    "settings-buttons-max-width": 100,
+    "message-input-buttons-max-width": 300,
+    "message-input-buttons-collapsed-width": 40,
+    "toolbar-buttons-max-width": 300,
+    "toolbar-max-width": 800,
+    "user-area-max-height": 300,
+    "message-input-max-height": 400,
+    "window-bar-height": 18,
+    "channel-list-width": 295,
+    "members-list-width": 0,
+    "profile-panel-width": 0,
+    "resizable-search-panel": true,
+    "resizable-forum-popout": true,
+    "search-panel-width": 0,
+    "forum-popout-width": 0,
+    "window-bar-button-active": true,
+    "user-area-button-active": true
+}
