@@ -1,3 +1,8 @@
 {
-    "Material Discord": true
+    "Material Discord": true,
+    "Dark+": false,
+    "AMOLED-Cord": false,
+    "midnight": false,
+    "MaterialDesign": false,
+    "Discord+": false
 }

@@ -3,18 +3,17 @@
     "drawerStates": {
         "settings": {
             "addons": false,
+            "store": false,
+            "general": true,
             "customcss": false,
             "editor": false,
             "window": true,
-            "developer": true,
-            "general": false,
-            "store": false
+            "developer": false
         }
     },
     "addonlistControls": {
         "plugin": {
-            "view": "grid",
-            "sort": "isEnabled"
+            "view": "grid"
         }
     }
 }

@@ -13,41 +13,42 @@
 @import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/source.css);
 
 /* Material You addon */
-@import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/addons/material-you/source.css);
+/* @import url(https://capnkitten.github.io/BetterDiscord/Themes/Material-Discord/css/addons/material-you/source.css); */
 
 /* MATERIAL YOU DARK THEME SETTINGS */
 .theme-dark {
-    --saturation-modifier: 0.17;
-    --lightness-modifier: 0.14;
-    --text-lightness-modifier: 1.66;
+	--saturation-modifier: 0.31;
+	--lightness-modifier: 0.225;
+	--text-lightness-modifier: 1.0;
+	--ui-darkness-modifier: 1.0;
 }
 
 /* MATERIAL YOU LIGHT THEME SETTINGS */
 .theme-light {
-    --saturation-modifier: 0.75;
-    --lightness-modifier: 2.1;
-    --text-lightness-modifier: 0.9;
+	--saturation-modifier: 0.74;
+	--lightness-modifier: 2.125;
+	--text-lightness-modifier: 1.0;
 }
 
 :root {
 	/* ACCENT HSL AND TEXT COLOR SETTINGS */
-	--accent-hue: 220;
-	--accent-saturation: 93%;
-	--accent-lightness: 45%;
+	/* --accent-hue: 227;
+	--accent-saturation: 71%;
+	--accent-lightness: 61%;
 	--accent-text-color: hsl(0,0%,100%);
-	--accent-button-action: hsl(0,0%,100%);
+	--accent-button-action: hsl(0,0%,100%); */
 
 	/* ALERT HSL AND TEXT COLOR SETTINGS */
 	--alert-hue: 0;
-    --alert-saturation: 85%;
-    --alert-lightness: 61%;
-	--alert-text-color: hsl(0,0%,100%); /* DOES NOTHING WITH MATERIAL YOU ENABLED */
+	--alert-saturation: 85%;
+	--alert-lightness: 61%;
+	--alert-text-color: hsl(0,0%,100%); 
 
 	/* WARNING HSL AND TEXT COLOR SETTINGS*/
 	--warning-hue: 40;
-    --warning-saturation: 86.4%;
-    --warning-lightness: 56.9%;
-	--warning-text-color: hsl(0,0%,100%); /* DOES NOTHING WITH MATERIAL YOU ENABLED */
+	--warning-saturation: 86.4%;
+	--warning-lightness: 56.9%;
+	--warning-text-color: hsl(0,0%,100%); 
 
 	/* MESSAGE SETTINGS */
 	--message-radius: 18px;
@@ -82,6 +83,6 @@
 	--tooltip-radius: 8px;
 
 	/* SCROLLBAR SETTINGS */
-	--scrollbar-width: 8px;
-	--scrollbar-thin-width: 8px;
+	--scrollbar-width: 10px;
+	--scrollbar-thin-width: 6px;
 }

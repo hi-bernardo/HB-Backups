@@ -1,16 +1,17 @@
 * {
-    font-family: 'Inter', sans-serif!important;
-    text-rendering: optimizeLegibility;
-    font-size: 12px;
-    text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.1), 0 0 11px rgba(255, 255, 255, 0.1);
+  font-family: "Inter", sans-serif !important;
+  text-rendering: optimizeLegibility;
+  font-size: 12px;
+  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.1),
+    0 0 11px rgba(255, 255, 255, 0.1);
 }
 .platform-win .typeWindows__421ed {
-    padding-right: 16px;
-    padding-top: 1px !important;
-    height: 26px; 
+  padding-right: 6px;
+  padding-top: 1px !important;
+  height: 26px;
 }
 .platform-win .typeWindows__421ed .winButton__421ed {
-    width: 24px; 
-    height: 24px;
-    padding-inline: 1.5px;
+  width: 24px;
+  height: 24px;
+  padding-inline: 1.5px;
 }

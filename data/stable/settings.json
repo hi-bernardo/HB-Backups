@@ -2,20 +2,20 @@
     "general": {
         "voiceDisconnect": true,
         "showToasts": false,
-        "mediaKeys": true,
+        "mediaKeys": false,
         "bdContextMenu": true,
         "themeAttributes": true
     },
     "addons": {
-        "addonErrors": true,
+        "addonErrors": false,
         "editAction": "detached",
         "checkForUpdates": true,
-        "updateInterval": 4
+        "updateInterval": "8"
     },
     "store": {
         "bdAddonStore": true,
         "alwaysEnable": true,
-        "addonEmbeds": true
+        "addonEmbeds": false
     },
     "customcss": {
         "customcss": true,
@@ -38,11 +38,11 @@
     },
     "developer": {
         "debugLogs": false,
-        "devTools": true,
+        "devTools": false,
         "debuggerHotkey": false,
         "reactDevTools": false,
-        "inspectElement": true,
-        "devToolsWarning": true,
+        "inspectElement": false,
+        "devToolsWarning": false,
         "recovery": true
     }
 }
