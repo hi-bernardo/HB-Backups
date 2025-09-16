@@ -2,7 +2,7 @@
  * @name ServerFolders
  * @author DevilBro
  * @authorId 278543574059057154
- * @version 7.3.4
+ * @version 7.4.2
  * @description Changes Discord's Folders, Servers open in a new Container, also adds extra Features to more easily organize, customize and manage your Folders
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
@@ -56,7 +56,7 @@ module.exports = (_ => {
 		stop () {}
 		getSettingsPanel () {
 			let template = document.createElement("template");
-			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${this.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
+			template.innerHTML = `<div style="color: var(--text-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${this.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
 			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
 			return template.content.firstElementChild;
 		}
@@ -82,10 +82,14 @@ module.exports = (_ => {
 			closedicon: `<path d="M 160,400 V 253 h 440 v 147 z" fill="REPLACE_FILL2"/><path d="M 186,799 c -24.2,0 -34,-8 -39.7,-13.6 C 140.8,779.9 134,769.1 134,747 V 372 c 0,-21.5 13,-32 13,-32 V 252 c 0,-20.2 2.8,-27.2 10.5,-36.4 C 165.1,206.5 172.8,200 199,200 h 173 l 54,53 H 225 c -17.3,0 -29.1,6 -39.6,16.5 C 175.8,279.1 173,290.4 173,305 l -0.4,19 c 0,0 9.6,-4 20.9,-4 H 494 L 614,200 h 186 c 17.7,0 26.6,7.1 36,14.2 C 846.5,222 852,233.6 852,252 v 495 c 0,16.1 -7.5,30.2 -14.1,36.7 C 831.4,790.2 815.9,799 800,799 Z" fill="REPLACE_FILL1"/>`}
 		];
 		
-		var folderGuildContent = null;
+		var folderGuildContent = null, scrollPosition = 0;
 		const FolderGuildContentComponent = class FolderGuildContent extends BdApi.React.Component {
 			componentDidMount() {
 				folderGuildContent = this;
+			}
+			componentDidUpdate() {
+				let scroller = BDFDB.ReactUtils.findDOMNode(this).querySelector(BDFDB.dotCN.guildsscroller);
+				if (scroller && scroller.scrollTop != scrollPosition) scroller.scrollTo({top: scrollPosition});
 			}
 			render() {
 				let closing = this.props.closing;
@@ -99,7 +103,6 @@ module.exports = (_ => {
 				}, 300);
 				
 				BDFDB.DOMUtils.toggleClass(document.body, BDFDB.disCN._serverfoldersfoldercontentisopen, !(!folders.length || closing));
-				
 				return BDFDB.ReactUtils.createElement("nav", {
 					className: BDFDB.DOMUtils.formatClassName(BDFDB.disCN.guildswrapper, BDFDB.disCN.guilds, this.props.isAppFullscreen && BDFDB.disCN.guildswrapperhidden, this.props.themeOverride && BDFDB.disCN.themedark, BDFDB.disCN._serverfoldersfoldercontent, (!folders.length || closing) && BDFDB.disCN._serverfoldersfoldercontentclosed),
 					children: BDFDB.ReactUtils.createElement("ul", {
@@ -111,6 +114,7 @@ module.exports = (_ => {
 							className: BDFDB.disCN.guildswrapperitems,
 							children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Scrollers.None, {
 								className: BDFDB.disCNS.stack + BDFDB.disCN.guildsscroller,
+								onScroll: e => scrollPosition = e.target.scrollTop,
 								children: BDFDB.ReactUtils.createElement("div", {
 									className: BDFDB.disCN.stack,
 									"aria-label": BDFDB.LanguageUtils.LanguageStrings.SERVERS,
@@ -121,27 +125,39 @@ module.exports = (_ => {
 											let folderIcons = _this.loadAllIcons();
 											folderIcon = folderIcons[data.iconID] ? (!folderIcons[data.iconID].customID ? _this.createBase64SVG(folderIcons[data.iconID].openicon, data.color1, data.color2) : folderIcons[data.iconID].openicon) : null;
 											folderIcon = folderIcon ? BDFDB.ReactUtils.createElement("div", {
-												className: BDFDB.disCN.guildfoldericonwrapper,
+												className: BDFDB.disCN.guildfolderbutton,
 												onClick: _ => BDFDB.LibraryModules.GuildUtils.toggleGuildFolderExpand(folder.folderId),
 												children: BDFDB.ReactUtils.createElement("div", {
-													className: BDFDB.disCN.guildfoldericonwrapperexpanded,
-													style: {background: `url(${folderIcon}) center/cover no-repeat`}
+													className: BDFDB.disCN.guildfolderbuttoncontent,
+													children: BDFDB.ReactUtils.createElement("div", {
+														className: BDFDB.disCN.guildfoldericonwrapper,
+														children: BDFDB.ReactUtils.createElement("div", {
+															className: BDFDB.disCN.guildfoldericon,
+															style: {background: `url(${folderIcon}) center/cover no-repeat`}
+														})
+													})
 												})
 											}) : BDFDB.ReactUtils.createElement("div", {
-												className: BDFDB.disCN.guildfoldericonwrapper,
+												className: BDFDB.disCN.guildfolderbutton,
 												onClick: _ => BDFDB.LibraryModules.GuildUtils.toggleGuildFolderExpand(folder.folderId),
 												children: BDFDB.ReactUtils.createElement("div", {
-													className: BDFDB.disCN.guildfoldericonwrapperexpanded,
-													children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
-														name: BDFDB.LibraryComponents.SvgIcon.Names.FOLDER,
-														style: {color: BDFDB.ColorUtils.convert(folder.folderColor || BDFDB.DiscordConstants.Colors.BRAND, "RGB")}
+													className: BDFDB.disCN.guildfolderbuttoncontent,
+													children: BDFDB.ReactUtils.createElement("div", {
+														className: BDFDB.disCN.guildfoldericonwrapper,
+														children: BDFDB.ReactUtils.createElement("div", {
+															className: BDFDB.disCN.guildfoldericon,
+															children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
+																name: BDFDB.LibraryComponents.SvgIcon.Names.FOLDER,
+																style: {color: BDFDB.ColorUtils.convert(folder.folderColor || BDFDB.DiscordConstants.Colors.BRAND, "RGB")}
+															})
+														})
 													})
 												})
 											});
 										}
 										return BDFDB.ReactUtils.createElement("div", {
-											className: BDFDB.disCNS.stack + BDFDB.disCN.guildfolderwrapper,
-											style: {"--folder-color": folder.folderColor ? BDFDB.ColorUtils.convert(folder.folderColor, "RGB") : null},
+											className: BDFDB.disCNS.stack + BDFDB.disCNS.guildfolderwrapper + BDFDB.disCN.guildfolderisexpanded,
+											style: {"--custom-folder-color": folder.folderColor ? BDFDB.ColorUtils.convert(folder.folderColor, "RGB") : null},
 											children: [
 												_this.settings.general.addFolderBackground && BDFDB.ReactUtils.createElement("span", {
 													className: BDFDB.disCN.guildfolderexpandedbackground
@@ -477,8 +493,7 @@ module.exports = (_ => {
 						"TooltipContainer"
 					],
 					after: [
-						"FolderHeader",
-						"FolderItemWrapper",
+						"FolderIconWrapper",
 						"FolderSettingsModal",
 						"GuildItem",
 						"GuildsBar"
@@ -538,10 +553,16 @@ module.exports = (_ => {
 						opacity: 0.5 !important;
 						z-index: 10000 !important;
 					}
-					${BDFDB.dotCN.channels + BDFDB.notCN.channelshidden}:has(${BDFDB.dotCN.guilds}) {
-						display: flex !important;
-						flex-direction: row !important;
-						width: auto !important;
+					${BDFDB.dotCNS._serverfoldersfoldercontentisopen + BDFDB.dotCN.chatbase} {
+						grid-template-columns: [start] min-content [guildsEnd] min-content [guildsEnd] min-content [channelsEnd] 1fr [end];
+						grid-template-rows: [top] var(--custom-app-top-bar-height) [titleBarEnd] min-content [noticeEnd] 1fr [end];
+						grid-template-areas:
+						"titleBar titleBar titleBar titleBar"
+						"guildsList guildsFolderList notice notice"
+						"guildsList guildsFolderList channelsList page";
+					}
+					${BDFDB.dotCN._serverfoldersfoldercontent} {
+						grid-area: guildsFolderList !important;
 					}
 					${BDFDB.dotCN._serverfoldersfoldercontent + BDFDB.notCN.guildswrapperhidden} {
 						transition: width 0.25s cubic-bezier(.44,1.04,1,1.01) !important;
@@ -556,15 +577,15 @@ module.exports = (_ => {
 					}
 					${BDFDB.dotCNS.guilds + BDFDB.dotCN.guildfolder},
 					${BDFDB.dotCNS.guilds + BDFDB.dotCN.guildfolder}:hover {
-						background-color: var(--background-secondary);
-					}
-					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfolder} {
+						background-color: var(--background-base-lower);
 						border-radius: 25%;
 					}
-					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfolder},
-					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfoldericonwrapper} {
+					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfolder} {
 						width: var(--guildbar-avatar-size, var(--guildbar-folder-size));
 						height: var(--guildbar-avatar-size, var(--guildbar-folder-size));
+					}
+					${BDFDB.dotCNS._serverfoldersfoldercontent + BDFDB.dotCN.guildfoldericonwrapper} {
+						padding: 0;
 					}
 					${BDFDB.dotCNS.guilds + BDFDB.dotCN.guildfoldericon} {
 						margin-bottom: 0 !important;
@@ -818,16 +839,7 @@ module.exports = (_ => {
 				folderStates[e.instance.props.folderNode.id] = state;
 			}
 			
-			processFolderItemWrapper (e) {
-				if (!e.instance.props.folderNode && e.returnvalue.props.style["--folder-color"]) return;
-				let folderColor = this.settings.general.addFolderBackground && BDFDB.LibraryStores.ExpandedGuildFolderStore.isFolderExpanded(e.instance.props.folderNode.id) && (BDFDB.ColorUtils.convert(e.instance.props.folderNode.color, "HEX") || BDFDB.ColorUtils.convert(BDFDB.DiscordConstants.Colors.BRAND, "RGB"));
-				if (folderColor) e.returnvalue = BDFDB.ReactUtils.createElement("div", {
-					style: {"--folder-color": folderColor},
-					children: e.returnvalue
-				});
-			}
-			
-			processFolderHeader (e) {
+			processFolderIconWrapper (e) {
 				if (!e.instance.props.folderNode) return;
 				let data = this.getFolderConfig(e.instance.props.folderNode.id);
 				
@@ -836,7 +848,7 @@ module.exports = (_ => {
 					if (parseInt(data.iconID) == -1 && (e.instance.props.expanded || data.useClosedIcon && !e.instance.props.expanded)) children[index] = BDFDB.ReactUtils.createElement("div", {
 						className: BDFDB.disCN.guildfoldericonwrapper,
 						children: BDFDB.ReactUtils.createElement("div", {
-							className: BDFDB.disCN.guildfoldericonwrapperexpanded,
+							className: BDFDB.disCN.guildfoldericon,
 							children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
 								name: BDFDB.LibraryComponents.SvgIcon.Names.FOLDER,
 								style: {color: BDFDB.ColorUtils.convert(data.color1 || BDFDB.DiscordConstants.Colors.BRAND, "RGB")}
@@ -850,7 +862,7 @@ module.exports = (_ => {
 							children[index] = BDFDB.ReactUtils.createElement("div", {
 								className: BDFDB.disCN.guildfoldericonwrapper,
 								children: BDFDB.ReactUtils.createElement("div", {
-									className: BDFDB.disCN.guildfoldericonwrapperexpanded,
+									className: BDFDB.disCN.guildfoldericon,
 									style: {background: `url(${icon}) center/cover no-repeat`}
 								})
 							});
@@ -859,9 +871,9 @@ module.exports = (_ => {
 					}
 					if (this.settings.general.showCountBadge) {
 						let mask = BDFDB.ReactUtils.findChild(e.returnvalue, {name: "BlobMask"});
-						if (mask) {
-							mask.props.upperLeftBadgeWidth = BDFDB.LibraryComponents.Badges.NumberBadge.prototype.getBadgeWidthForValue(e.instance.props.folderNode.children.length);
-							mask.props.upperLeftBadge = BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Badges.NumberBadge, {
+						if (mask && !mask.props.upperBadge) {
+							mask.props.upperBadgeWidth = BDFDB.LibraryComponents.Badges.NumberBadge.prototype.getBadgeWidthForValue(e.instance.props.folderNode.children.length);
+							mask.props.upperBadge = BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Badges.NumberBadge, {
 								count: e.instance.props.folderNode.children.length,
 								style: {backgroundColor: "var(--bdfdb-blurple)"}
 							});
@@ -885,7 +897,7 @@ module.exports = (_ => {
 						className: BDFDB.disCN.guildlistitemtooltip,
 						type: "right",
 						list: true,
-						offset: 12,
+						offset: 4,
 						backgroundColor: data.color3,
 						fontColor: data.color4
 					},
@@ -920,7 +932,7 @@ module.exports = (_ => {
 								type: "right",
 								list: true,
 								guild: e.instance.props.guild,
-								offset: 12
+								offset: 4
 							}, data.copyTooltipColor && {
 								backgroundColor: data.color3,
 								fontColor: data.color4,
@@ -961,14 +973,7 @@ module.exports = (_ => {
 									{value: this.labels.modal_tabheader3},
 									{value: this.labels.modal_tabheader4}
 								],
-								onItemSelect: (value, instance) => {
-									let tabsArray = BDFDB.ObjectUtils.toArray(tabs);
-									for (let ins of tabsArray) {
-										if (ins.props.tab == value) ins.props.open = true;
-										else delete ins.props.open;
-									}
-									BDFDB.ReactUtils.forceUpdate(tabsArray);
-								}
+								onItemSelect: value => {for (let key in tabs) tabs[key].setState({open: key == value});}
 							})
 						})
 					}));

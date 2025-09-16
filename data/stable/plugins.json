@@ -9,10 +9,9 @@
     "Embed More Images": true,
     "ImageUtilities": true,
     "MessageUtilities": true,
-    "PluginRepo": false,
-    "PrettyFolders": true,
     "ReadAllNotificationsButton": true,
     "ServerFolders": true,
     "VoiceUsersCounter": true,
-    "YABDP4Nitro": true
+    "YABDP4Nitro": true,
+    "PrettyFolders": true
 }

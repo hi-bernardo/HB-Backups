@@ -2,7 +2,7 @@
  * @name ReadAllNotificationsButton
  * @author DevilBro
  * @authorId 278543574059057154
- * @version 1.8.0
+ * @version 1.8.3
  * @description Adds a Clear Button to the Server List and the Mentions Popout
  * @invite Jx3TjNS
  * @donate https://www.paypal.me/MircoWittrien
@@ -56,7 +56,7 @@ module.exports = (_ => {
 		stop () {}
 		getSettingsPanel () {
 			let template = document.createElement("template");
-			template.innerHTML = `<div style="color: var(--header-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${this.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
+			template.innerHTML = `<div style="color: var(--text-primary); font-size: 16px; font-weight: 300; white-space: pre; line-height: 22px;">The Library Plugin needed for ${this.name} is missing.\nPlease click <a style="font-weight: 500;">Download Now</a> to install it.</div>`;
 			template.content.firstElementChild.querySelector("a").addEventListener("click", this.downloadLibrary);
 			return template.content.firstElementChild;
 		}
@@ -152,7 +152,7 @@ module.exports = (_ => {
 			
 				this.modulePatches = {
 					after: [
-						"GuildsBar",
+						"UnreadDMs",
 						"InboxHeader"
 					]
 				};
@@ -169,18 +169,17 @@ module.exports = (_ => {
 					}
 					${BDFDB.dotCN._readallnotificationsbuttonframe} {
 						--guildbar-avatar-size: 48px;
-						height: 24px;
-						margin-bottom: 10px;
 					}
 					${BDFDB.dotCN._readallnotificationsbuttonframe}:active {
 						transform: translateY(1px);
 					}
-					${BDFDB.dotCN._readallnotificationsbuttoninner} {
+					#app-mount ${BDFDB.dotCN._readallnotificationsbuttonframe},
+					#app-mount ${BDFDB.dotCN._readallnotificationsbuttoninner},
+					#app-mount ${BDFDB.dotCN._readallnotificationsbuttonbutton} {
 						height: 24px;
 					}
 					${BDFDB.dotCN._readallnotificationsbuttonbutton} {
 						border-radius: 4px;
-						height: 24px;
 						font-size: 12px;
 						line-height: 1.3;
 						white-space: nowrap;
@@ -279,21 +278,9 @@ module.exports = (_ => {
 				BDFDB.DiscordUtils.rerenderAll();
 			}
 			
-			processGuildsBar (e) {
-				const process = returnValue => {
-					let [children, index] = BDFDB.ReactUtils.findParent(returnValue, {name: "UnreadDMs"});
-					if (index > -1) children.splice(index + 1, 0, BDFDB.ReactUtils.createElement(ReadAllButtonComponent, {}));
-				};
-				let themeWrapper = BDFDB.ReactUtils.findChild(e.returnvalue, {filter: n => n && n.props && typeof n.props.children == "function"});
-				if (themeWrapper) {
-					let childrenRender = themeWrapper.props.children;
-					themeWrapper.props.children = BDFDB.TimeUtils.suppress((...args) => {
-						let children = childrenRender(...args);
-						process(children);
-						return children;
-					}, "Error in Children Render of Theme Wrapper!", this);
-				}
-				else process(e.returnvalue);
+			processUnreadDMs (e) {
+				e.returnvalue = [e.returnvalue].flat(10);
+				e.returnvalue.push(BDFDB.ReactUtils.createElement(ReadAllButtonComponent, {}));
 			}
 
 			processInboxHeader (e) {
@@ -306,7 +293,7 @@ module.exports = (_ => {
 					BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.TooltipContainer, {
 						text: `${BDFDB.LanguageUtils.LanguageStrings.CLOSE} (${BDFDB.LanguageUtils.LanguageStrings.FORM_LABEL_ALL})`,
 						children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.Clickable, {
-							className: BDFDB.disCNS.messagespopoutbutton + BDFDB.disCNS.messagespopoutbuttonsecondary + BDFDB.disCN.messagespopoutbuttonsize32,
+							className: BDFDB.disCNS.messagespopoutbutton + BDFDB.disCNS.messagespopoutbuttontertiary + BDFDB.disCN.messagespopoutbuttonsize32,
 							children: BDFDB.ReactUtils.createElement(BDFDB.LibraryComponents.SvgIcon, {
 								nativeClass: true,
 								name: BDFDB.LibraryComponents.SvgIcon.Names.CLOSE,
